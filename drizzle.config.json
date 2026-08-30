@@ -1,0 +1,7 @@
+{
+  "dialect": "postgresql",
+  "schema": "./src/db/schema.js",
+  "dbCredentials": {
+    "url": "postgresql://postgres:Yug%401213@127.0.0.1:5432/vimuhet"
+  }
+}
