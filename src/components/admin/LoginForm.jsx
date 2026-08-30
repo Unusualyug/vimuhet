@@ -32,7 +32,8 @@ export default function LoginForm() {
       if (data.token) {
         saveAdminToken(data.token);
         // Pass token in URL — works even when localStorage is blocked (e.g. iframes)
-        window.location.href = "/admin?_token=" + encodeURIComponent(data.token);
+        window.location.href =
+          "/admin?_token=" + encodeURIComponent(data.token);
       } else {
         window.location.href = "/admin";
       }
@@ -46,7 +47,9 @@ export default function LoginForm() {
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-5 py-16">
       <div
         className="absolute left-1/2 top-1/3 h-[30rem] w-[30rem] -translate-x-1/2 rounded-full opacity-30 animate-blob"
-        style={{ background: "radial-gradient(circle,#ff5d8f,transparent 65%)" }}
+        style={{
+          background: "radial-gradient(circle,#ff5d8f,transparent 65%)",
+        }}
       />
       <motion.div
         initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
@@ -65,11 +68,15 @@ export default function LoginForm() {
         </Link>
 
         <h1 className="mt-9 font-display text-3xl">Admin sign in</h1>
-        <p className="mt-2 text-sm text-cream/45">Manage products, store links and analytics.</p>
+        <p className="mt-2 text-sm text-cream/45">
+          Manage products, store links and analytics.
+        </p>
 
         <form onSubmit={submit} className="mt-8 space-y-4">
           <label className="block">
-            <span className="text-[0.58rem] uppercase tracking-[0.3em] text-cream/40">Username</span>
+            <span className="text-[0.58rem] uppercase tracking-[0.3em] text-cream/40">
+              Username
+            </span>
             <input
               value={form.username}
               onChange={(e) => setForm({ ...form, username: e.target.value })}
@@ -78,7 +85,9 @@ export default function LoginForm() {
             />
           </label>
           <label className="block">
-            <span className="text-[0.58rem] uppercase tracking-[0.3em] text-cream/40">Password</span>
+            <span className="text-[0.58rem] uppercase tracking-[0.3em] text-cream/40">
+              Password
+            </span>
             <input
               type="password"
               value={form.password}
@@ -110,7 +119,7 @@ export default function LoginForm() {
 
         <div className="mt-7 rounded-xl border border-white/8 bg-ink/50 p-4 text-[0.68rem] leading-relaxed text-cream/40">
           Credentials: <span className="text-gold">jay</span> /{" "}
-          <span className="text-gold">vimuhet@admin</span>
+          <span className="text-gold"></span>
         </div>
 
         <Link

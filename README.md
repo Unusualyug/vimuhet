@@ -13,12 +13,12 @@ A two-interface website for the VIMUHET clothing label:
 
 ## Stack
 
-| Layer | Technology |
-| --- | --- |
-| UI | **React 19** (JSX, no TypeScript) + Tailwind CSS v4 + Framer Motion |
+| Layer        | Technology                                                                                  |
+| ------------ | ------------------------------------------------------------------------------------------- |
+| UI           | **React 19** (JSX, no TypeScript) + Tailwind CSS v4 + Framer Motion                         |
 | Server / API | **Node.js** — Next.js App Router route handlers (Express-style REST endpoints under `/api`) |
-| Database | **PostgreSQL** via Drizzle ORM (`src/db/schema.js`) |
-| Media | **Cloudinary** (`src/lib/cloudinary.js`) with automatic PostgreSQL fallback |
+| Database     | **PostgreSQL** via Drizzle ORM (`src/db/schema.js`)                                         |
+| Media        | **Cloudinary** (`src/lib/cloudinary.js`) with automatic PostgreSQL fallback                 |
 
 Everything is written in **JavaScript** — there are no `.ts` / `.tsx` files in the app code.
 
@@ -32,6 +32,7 @@ Everything is written in **JavaScript** — there are no `.ts` / `.tsx` files in
 ## Features
 
 ### Storefront
+
 - Animated preloader, scroll progress bar, drifting gradient blobs, grain, marquees.
 - Kinetic hero with parallax product collage and animated counters.
 - Category rail, trending grid (image cross-fade on hover + quick-buy pills per marketplace).
@@ -42,6 +43,7 @@ Everything is written in **JavaScript** — there are no `.ts` / `.tsx` files in
 - **Buy buttons** track the click (`/api/track/click`) and then open the marketplace app/web.
 
 ### Admin console (`/admin`)
+
 - Cookie-session login (`/admin/login`) — HMAC-signed token, `ADMIN_USERNAME` / `ADMIN_PASSWORD`.
 - Dashboard: total visitors, unique sessions, visits today/week, **marketplace clicks**, clicks
   today/week, CTR, product counts, 14-day traffic chart, clicks-by-marketplace bars, hourly visits,
@@ -55,18 +57,18 @@ Everything is written in **JavaScript** — there are no `.ts` / `.tsx` files in
 
 ## API
 
-| Method | Route | Purpose |
-| --- | --- | --- |
-| GET | `/api/health` | DB ping |
-| GET | `/api/products` | Public catalogue (`category`, `q`, `sort`, `limit`) |
-| POST | `/api/products` | Create product *(admin)* |
-| GET/PUT/DELETE | `/api/products/:id` | Read / update (`{ patch }` for toggles) / delete *(admin)* |
-| POST | `/api/admin/login` / `/api/admin/logout` | Session |
-| GET | `/api/admin/stats` | Visitor + click analytics *(admin)* |
-| POST | `/api/admin/upload` | Multi-file image upload → Cloudinary or DB *(admin)* |
-| GET | `/api/uploads/:id` | Serve a DB-stored image |
-| POST | `/api/track/visit` | Storefront visit (deduped per session/path per 30 min) |
-| POST | `/api/track/click` | Marketplace button tap |
+| Method         | Route                                    | Purpose                                                    |
+| -------------- | ---------------------------------------- | ---------------------------------------------------------- |
+| GET            | `/api/health`                            | DB ping                                                    |
+| GET            | `/api/products`                          | Public catalogue (`category`, `q`, `sort`, `limit`)        |
+| POST           | `/api/products`                          | Create product _(admin)_                                   |
+| GET/PUT/DELETE | `/api/products/:id`                      | Read / update (`{ patch }` for toggles) / delete _(admin)_ |
+| POST           | `/api/admin/login` / `/api/admin/logout` | Session                                                    |
+| GET            | `/api/admin/stats`                       | Visitor + click analytics _(admin)_                        |
+| POST           | `/api/admin/upload`                      | Multi-file image upload → Cloudinary or DB _(admin)_       |
+| GET            | `/api/uploads/:id`                       | Serve a DB-stored image                                    |
+| POST           | `/api/track/visit`                       | Storefront visit (deduped per session/path per 30 min)     |
+| POST           | `/api/track/click`                       | Marketplace button tap                                     |
 
 ---
 
@@ -85,5 +87,9 @@ readable; real visits and clicks accumulate on top of them.
 **Admin login:** `admin` / `vimuhet@admin` (override with `ADMIN_USERNAME` / `ADMIN_PASSWORD`).
 
 ### Enabling Cloudinary
+
 Fill `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` and `CLOUDINARY_API_SECRET` in `.env` and
 restart — uploads move to Cloudinary automatically (the admin sidebar shows which mode is active).
+
+username: jay
+password: vimuhet@admin
