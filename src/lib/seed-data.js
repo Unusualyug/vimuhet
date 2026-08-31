@@ -1,3 +1,5 @@
+export const seedProducts = [];
+
 // const px = (id) =>
 //   `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1100&w=800`;
 
@@ -19,8 +21,6 @@
 
 // const T = ["S", "M", "L", "XL", "XXL"];
 // const K = ["S", "M", "L", "XL", "XXL", "3XL"];
-
-export const seedProducts = [];
 
 // export const seedProducts = [
 //   {
