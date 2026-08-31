@@ -65,6 +65,9 @@ export default function Nav() {
               alt="Vimuhet"
               className="h-10 w-auto rounded-md object-contain"
             />
+            <span className="font-display text-xl tracking-[0.22em] text-cream transition-colors group-hover:text-gold">
+              VIMUHET
+            </span>
           </Link>
 
           <nav className="hidden items-center gap-9 md:flex">
