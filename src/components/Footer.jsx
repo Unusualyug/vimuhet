@@ -9,17 +9,24 @@ export default function Footer() {
     <footer className="relative mt-24 overflow-hidden border-t border-white/5 bg-ink-2">
       <div
         className="pointer-events-none absolute -left-40 top-0 h-96 w-96 rounded-full opacity-25 animate-blob"
-        style={{ background: "radial-gradient(circle,#8b5cff,transparent 65%)" }}
+        style={{
+          background: "radial-gradient(circle,#8b5cff,transparent 65%)",
+        }}
       />
       <div className="relative mx-auto max-w-7xl px-5 py-16 sm:px-8">
         <div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <Link href="/" className="font-display text-3xl tracking-[0.2em]">
-              VIMUHET
+            <Link href="/">
+              <img
+                src="/images/vimuhet-logo.png"
+                alt="Vimuhet"
+                className="h-14 w-auto object-contain"
+              />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-cream/50">
-              A modern Indian clothing label. We design, you choose your marketplace — every piece is one tap away on
-              Amazon, Flipkart, Meesho and Myntra.
+              A modern Indian clothing label. We design, you choose your
+              marketplace — every piece is one tap away on Amazon, Flipkart,
+              Meesho and Myntra.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {PLATFORMS.map((p) => (
@@ -44,7 +51,10 @@ export default function Footer() {
 
           <FooterCol
             title="Shop"
-            items={CATEGORIES.map((c) => ({ label: c.label, href: `/shop?category=${c.key}` }))}
+            items={CATEGORIES.map((c) => ({
+              label: c.label,
+              href: `/shop?category=${c.key}`,
+            }))}
           />
           <FooterCol
             title="Company"
@@ -56,7 +66,9 @@ export default function Footer() {
             ]}
           />
           <div>
-            <h4 className="text-[0.62rem] uppercase tracking-[0.35em] text-gold">Support</h4>
+            <h4 className="text-[0.62rem] uppercase tracking-[0.35em] text-gold">
+              Support
+            </h4>
             <ul className="mt-5 space-y-3 text-sm text-cream/55">
               <li>hello@vimuhet.in</li>
               <li>Mon–Sat, 10am – 7pm IST</li>
@@ -68,7 +80,13 @@ export default function Footer() {
 
       <div className="border-y border-white/5 py-5 text-[0.7rem] uppercase tracking-[0.4em] text-cream/25">
         <Marquee
-          items={["Made in India", "Small-batch production", "Fair wages", "Low waste", "Ship across India"]}
+          items={[
+            "Made in India",
+            "Small-batch production",
+            "Fair wages",
+            "Low waste",
+            "Ship across India",
+          ]}
           slow
         />
       </div>
@@ -84,11 +102,16 @@ export default function Footer() {
 function FooterCol({ title, items }) {
   return (
     <div>
-      <h4 className="text-[0.62rem] uppercase tracking-[0.35em] text-gold">{title}</h4>
+      <h4 className="text-[0.62rem] uppercase tracking-[0.35em] text-gold">
+        {title}
+      </h4>
       <ul className="mt-5 space-y-3 text-sm">
         {items.map((item) => (
           <li key={item.label}>
-            <Link href={item.href} className="text-cream/55 transition-colors hover:text-cream">
+            <Link
+              href={item.href}
+              className="text-cream/55 transition-colors hover:text-cream"
+            >
               {item.label}
             </Link>
           </li>

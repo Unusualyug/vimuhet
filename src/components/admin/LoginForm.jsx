@@ -57,14 +57,12 @@ export default function LoginForm() {
         transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
         className="relative w-full max-w-md rounded-[32px] border border-white/10 bg-ink-2/80 p-9 backdrop-blur-xl"
       >
-        <Link href="/" className="flex items-center gap-3">
-          <span
-            className="flex h-10 w-10 items-center justify-center rounded-xl font-display text-xl font-bold text-ink animate-grad"
-            style={{ background: "var(--grad)" }}
-          >
-            V
-          </span>
-          <span className="font-display text-xl tracking-[0.2em]">VIMUHET</span>
+        <Link href="/">
+          <img
+            src="/images/vimuhet-logo.png"
+            alt="Vimuhet"
+            className="h-12 w-auto object-contain"
+          />
         </Link>
 
         <h1 className="mt-9 font-display text-3xl">Admin sign in</h1>
@@ -119,7 +117,7 @@ export default function LoginForm() {
 
         <div className="mt-7 rounded-xl border border-white/8 bg-ink/50 p-4 text-[0.68rem] leading-relaxed text-cream/40">
           Credentials: <span className="text-gold">jay</span> /{" "}
-          <span className="text-gold"></span>
+          <span className="text-gold">vimuhet@admin</span>
         </div>
 
         <Link

@@ -16,10 +16,14 @@ export const metadata = {
     "flipkart",
     "meesho",
   ],
+  icons: {
+    icon: "/images/vimuhet-logo.png",
+  },
   openGraph: {
     title: "VIMUHET — Clothing that moves with you",
     description: "Shop VIMUHET on Amazon, Flipkart, Meesho and Myntra.",
     type: "website",
+    images: ["/images/vimuhet-logo.png"],
   },
 };
 
@@ -27,10 +31,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <meta
-          name="google-site-verification"
-          content="fAE-nuklo8OiGBwJfWX-Vz7zK_UqQI8VgQSS8iDkLUw"
-        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"

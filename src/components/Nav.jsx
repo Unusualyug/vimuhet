@@ -53,18 +53,18 @@ export default function Nav() {
 
       <header
         className={`sticky top-0 z-[60] transition-all duration-500 ${
-          scrolled ? "glass border-b border-white/5 py-3" : "border-b border-transparent py-6"
+          scrolled
+            ? "glass border-b border-white/5 py-3"
+            : "border-b border-transparent py-6"
         }`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 sm:px-8">
           <Link href="/" className="group flex items-center gap-3">
-            <span className="relative flex h-9 w-9 items-center justify-center">
-              <span className="absolute inset-0 rounded-xl opacity-90 animate-grad" style={{ background: "var(--grad)" }} />
-              <span className="relative font-display text-lg font-bold text-ink">V</span>
-            </span>
-            <span className="font-display text-xl tracking-[0.22em] text-cream transition-colors group-hover:text-gold">
-              VIMUHET
-            </span>
+            <img
+              src="/images/vimuhet-logo.png"
+              alt="Vimuhet"
+              className="h-10 w-auto rounded-md object-contain"
+            />
           </Link>
 
           <nav className="hidden items-center gap-9 md:flex">
@@ -116,7 +116,9 @@ export default function Nav() {
             <span
               className={`h-[1.5px] w-4 bg-cream transition-transform duration-300 ${open ? "translate-y-[6px] rotate-45" : ""}`}
             />
-            <span className={`h-[1.5px] w-4 bg-cream transition-opacity duration-200 ${open ? "opacity-0" : ""}`} />
+            <span
+              className={`h-[1.5px] w-4 bg-cream transition-opacity duration-200 ${open ? "opacity-0" : ""}`}
+            />
             <span
               className={`h-[1.5px] w-4 bg-cream transition-transform duration-300 ${open ? "-translate-y-[6px] -rotate-45" : ""}`}
             />
