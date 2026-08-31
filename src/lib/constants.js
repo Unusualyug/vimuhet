@@ -6,7 +6,7 @@ export const PLATFORMS = [
     color: "#FF9900",
     soft: "rgba(255,153,0,0.14)",
     gradient: "linear-gradient(135deg,#FFB300 0%,#FF7A00 100%)",
-    url: "https://www.amazon.in",
+    url: "https://www.amazon.in/s?rh=n%3A1571271031%2Cp_4%3AVimuhet&ref=bl_sl_s_ap_web_1571271031",
     app: "amazon://",
   },
   {
@@ -44,21 +44,28 @@ export const PLATFORMS = [
 export const PLATFORM_KEYS = PLATFORMS.map((p) => p.key);
 
 export function platformMeta(key) {
-  return PLATFORMS.find((p) => p.key === key) || {
-    key,
-    label: key || "Store",
-    color: "#9ca3af",
-    soft: "rgba(156,163,175,0.14)",
-    gradient: "linear-gradient(135deg,#d1d5db,#6b7280)",
-    url: "#",
-    app: "#",
-  };
+  return (
+    PLATFORMS.find((p) => p.key === key) || {
+      key,
+      label: key || "Store",
+      color: "#9ca3af",
+      soft: "rgba(156,163,175,0.14)",
+      gradient: "linear-gradient(135deg,#d1d5db,#6b7280)",
+      url: "#",
+      app: "#",
+    }
+  );
 }
 
 export const CATEGORIES = [
   { key: "tshirts", label: "T-Shirts", emoji: "👕", blurb: "Everyday cottons" },
   { key: "shirts", label: "Shirts", emoji: "🧥", blurb: "Smart casuals" },
-  { key: "kurtas", label: "Kurtas & Suits", emoji: "🪭", blurb: "Festive ethnic" },
+  {
+    key: "kurtas",
+    label: "Kurtas & Suits",
+    emoji: "🪭",
+    blurb: "Festive ethnic",
+  },
   { key: "hoodies", label: "Hoodies", emoji: "🧢", blurb: "Street layers" },
   { key: "dresses", label: "Dresses", emoji: "👗", blurb: "Occasion wear" },
   { key: "bottoms", label: "Bottoms", emoji: "👖", blurb: "Denim & joggers" },
@@ -69,7 +76,16 @@ export function categoryLabel(key) {
   return found ? found.label : key || "Collection";
 }
 
-export const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "XXL", "3XL", "Free Size"];
+export const SIZE_OPTIONS = [
+  "XS",
+  "S",
+  "M",
+  "L",
+  "XL",
+  "XXL",
+  "3XL",
+  "Free Size",
+];
 
 export function slugify(value) {
   return String(value || "")
@@ -97,12 +113,22 @@ export function bestLink(product) {
   const links = Array.isArray(product?.links) ? product.links : [];
   const priced = links.filter((l) => l && l.url);
   if (!priced.length) return null;
-  return priced.slice().sort((a, b) => (a.price || product.price || 0) - (b.price || product.price || 0))[0];
+  return priced
+    .slice()
+    .sort(
+      (a, b) =>
+        (a.price || product.price || 0) - (b.price || product.price || 0),
+    )[0];
 }
 
 export function priceRange(product) {
-  const links = Array.isArray(product?.links) ? product.links.filter((l) => l && l.url) : [];
-  const prices = [Number(product.price || 0), ...links.map((l) => Number(l.price || 0))].filter(Boolean);
+  const links = Array.isArray(product?.links)
+    ? product.links.filter((l) => l && l.url)
+    : [];
+  const prices = [
+    Number(product.price || 0),
+    ...links.map((l) => Number(l.price || 0)),
+  ].filter(Boolean);
   if (!prices.length) return { min: 0, max: 0 };
   return { min: Math.min(...prices), max: Math.max(...prices) };
 }
@@ -119,7 +145,11 @@ export function normalizeLinks(links) {
 }
 
 export function toArray(value) {
-  if (Array.isArray(value)) return value.filter(Boolean).map((v) => String(v).trim()).filter(Boolean);
+  if (Array.isArray(value))
+    return value
+      .filter(Boolean)
+      .map((v) => String(v).trim())
+      .filter(Boolean);
   if (typeof value === "string") {
     return value
       .split(",")
