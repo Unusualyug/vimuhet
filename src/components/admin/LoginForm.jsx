@@ -116,7 +116,7 @@ export default function LoginForm() {
         </form>
 
         <div className="mt-7 rounded-xl border border-white/8 bg-ink/50 p-4 text-[0.68rem] leading-relaxed text-cream/40">
-          Credentials: <span className="text-gold">jay/ Umesh</span>{" "}
+          Credentials: <span className="text-gold"></span>{" "}
           <span className="text-gold"></span>
         </div>
 
