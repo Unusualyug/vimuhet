@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { PLATFORMS, formatINR, platformMeta } from "@/lib/constants";
 import { trackAndOpen, cleanMarketplaceUrl } from "@/lib/client-utils";
 
@@ -22,23 +21,13 @@ export function BuyButtons({ product, layout = "stack" }) {
         const targetUrl = cleanMarketplaceUrl(link.url, link.platform);
 
         return (
-          <motion.a
+          /* Standard HTML <a> tag without Framer Motion or target="_blank" to match WhatsApp behavior */
+          <a
             key={`${link.platform}-${i}`}
             href={targetUrl}
-            target="_blank"
-            rel="noopener noreferrer"
             onClick={() => {
               trackAndOpen({ product, platform: link.platform, url: link.url });
             }}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              delay: 0.08 * i,
-              duration: 0.6,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-            whileHover={{ y: -3, scale: 1.01 }}
-            whileTap={{ scale: 0.98 }}
             className="btn-shine group relative flex w-full items-center justify-between gap-4 overflow-hidden rounded-2xl border border-white/10 px-5 py-4 text-left cursor-pointer"
             style={{ background: meta.soft }}
           >
@@ -74,7 +63,7 @@ export function BuyButtons({ product, layout = "stack" }) {
               className="absolute inset-0 -z-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
               style={{ background: meta.gradient, opacity: 0.16 }}
             />
-          </motion.a>
+          </a>
         );
       })}
     </div>
@@ -105,20 +94,9 @@ export function PlatformStrip() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {PLATFORMS.map((p, i) => (
-        <motion.a
+        <a
           key={p.key}
           href={p.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{
-            delay: i * 0.08,
-            duration: 0.7,
-            ease: [0.16, 1, 0.3, 1],
-          }}
-          whileHover={{ y: -6 }}
           className="group relative overflow-hidden rounded-3xl border border-white/10 p-6"
           style={{ background: p.soft }}
         >
@@ -142,7 +120,7 @@ export function PlatformStrip() {
               →
             </span>
           </span>
-        </motion.a>
+        </a>
       ))}
     </div>
   );
