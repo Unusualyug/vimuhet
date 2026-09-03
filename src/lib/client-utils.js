@@ -119,7 +119,7 @@ export function deviceType() {
   return "desktop";
 }
 
-/** Automatically cleans Amazon links to standard /dp/ASIN format with affiliate tag */
+/** Clean Amazon links to standard /dp/ASIN format with affiliate tag */
 export function cleanMarketplaceUrl(url = "", platform = "") {
   if (!url) return "#";
 
@@ -133,23 +133,18 @@ export function cleanMarketplaceUrl(url = "", platform = "") {
   return url;
 }
 
-/** Logs a marketplace tap then hands the shopper over to Amazon / Flipkart / Meesho. */
-export function trackAndOpen({ product, platform, url, onDone }) {
-  // 1. Clean the URL to ensure mobile deep-linking & affiliate tag work properly
-  const cleanUrl = cleanMarketplaceUrl(url, platform);
-
-  // 2. Prepare tracking payload
-  const payload = JSON.stringify({
-    productId: product?.id,
-    productName: product?.name,
-    platform,
-    price: product?.price || 0,
-    sessionId: sessionId(),
-    referrer: typeof document !== "undefined" ? document.referrer : "",
-  });
-
-  // 3. Send tracking event
+/** Logs click analytics in background without blocking natural hyperlink navigation */
+export function trackAndOpen({ product, platform, url }) {
   try {
+    const payload = JSON.stringify({
+      productId: product?.id,
+      productName: product?.name,
+      platform,
+      price: product?.price || 0,
+      sessionId: sessionId(),
+      referrer: typeof document !== "undefined" ? document.referrer : "",
+    });
+
     if (typeof navigator !== "undefined" && navigator.sendBeacon) {
       const blob = new Blob([payload], { type: "application/json" });
       navigator.sendBeacon("/api/track/click", blob);
@@ -163,16 +158,5 @@ export function trackAndOpen({ product, platform, url, onDone }) {
     }
   } catch {
     /* never block the shopper */
-  }
-
-  onDone?.();
-
-  // 4. Open the link natively for Mobile vs Desktop
-  const isMobile = deviceType() === "mobile";
-
-  if (isMobile) {
-    window.location.href = cleanUrl;
-  } else {
-    window.open(cleanUrl, "_blank", "noopener,noreferrer");
   }
 }

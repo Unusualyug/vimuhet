@@ -251,16 +251,11 @@ export default function ProductCard({ product, index = 0, priority = false }) {
                   return (
                     <a
                       key={link.platform}
-                      href={
-                        link.platform === "amazon"
-                          ? cleanMarketplaceUrl(link.url, "amazon")
-                          : link.url
-                      }
+                      href={cleanMarketplaceUrl(link.url, link.platform)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
+                      onClick={() => {
+                        // Only track analytics, let native browser handle hyperlink tap
                         trackAndOpen({
                           product,
                           platform: link.platform,

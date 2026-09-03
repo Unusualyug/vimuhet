@@ -3,31 +3,41 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { PLATFORMS, formatINR, platformMeta } from "@/lib/constants";
-import { trackAndOpen } from "@/lib/client-utils";
+import { trackAndOpen, cleanMarketplaceUrl } from "@/lib/client-utils";
 
 /** Big marketplace buttons used on the product detail page. */
 export function BuyButtons({ product, layout = "stack" }) {
   const links = (product.links || []).filter((l) => l && l.url);
-  const [pending, setPending] = useState("");
 
   if (!links.length) {
     return <p className="text-sm text-cream/50">Store links coming soon.</p>;
   }
 
   return (
-    <div className={layout === "stack" ? "space-y-3" : "grid gap-3 sm:grid-cols-2"}>
+    <div
+      className={layout === "stack" ? "space-y-3" : "grid gap-3 sm:grid-cols-2"}
+    >
       {links.map((link, i) => {
         const meta = platformMeta(link.platform);
         const price = Number(link.price || product.price || 0);
-        const isActive = pending === link.platform;
+        const targetUrl = cleanMarketplaceUrl(link.url, link.platform);
+
         return (
-          <motion.button
+          <motion.a
             key={`${link.platform}-${i}`}
-            type="button"
-            onClick={() => trackAndOpen({ product, platform: link.platform, url: link.url, onDone: () => setPending(link.platform) })}
+            href={targetUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() =>
+              trackAndOpen({ product, platform: link.platform, url: link.url })
+            }
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.08 * i, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            transition={{
+              delay: 0.08 * i,
+              duration: 0.6,
+              ease: [0.16, 1, 0.3, 1],
+            }}
             whileHover={{ y: -3, scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
             className="btn-shine group relative flex w-full items-center justify-between gap-4 overflow-hidden rounded-2xl border border-white/10 px-5 py-4 text-left"
@@ -41,17 +51,23 @@ export function BuyButtons({ product, layout = "stack" }) {
                 {meta.short}
               </span>
               <span>
-                <span className="block text-sm font-semibold tracking-wide text-cream">Buy on {meta.label}</span>
+                <span className="block text-sm font-semibold tracking-wide text-cream">
+                  Buy on {meta.label}
+                </span>
                 <span className="block text-[0.68rem] uppercase tracking-[0.2em] text-cream/45">
-                  {isActive ? "Opening app…" : "Opens app or website"}
+                  Opens app or website
                 </span>
               </span>
             </span>
             <span className="relative z-10 text-right">
-              <span className="block font-display text-lg text-cream">{formatINR(price)}</span>
+              <span className="block font-display text-lg text-cream">
+                {formatINR(price)}
+              </span>
               {price !== Number(product.price) && (
                 <span className="block text-[0.62rem] uppercase tracking-[0.2em] text-cream/40">
-                  {price < Number(product.price) ? "lowest here" : "listed price"}
+                  {price < Number(product.price)
+                    ? "lowest here"
+                    : "listed price"}
                 </span>
               )}
             </span>
@@ -59,7 +75,7 @@ export function BuyButtons({ product, layout = "stack" }) {
               className="absolute inset-0 -z-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
               style={{ background: meta.gradient, opacity: 0.16 }}
             />
-          </motion.button>
+          </motion.a>
         );
       })}
     </div>
@@ -98,7 +114,11 @@ export function PlatformStrip() {
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: i * 0.08, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          transition={{
+            delay: i * 0.08,
+            duration: 0.7,
+            ease: [0.16, 1, 0.3, 1],
+          }}
           whileHover={{ y: -6 }}
           className="group relative overflow-hidden rounded-3xl border border-white/10 p-6"
           style={{ background: p.soft }}
@@ -114,10 +134,14 @@ export function PlatformStrip() {
             {p.short}
           </span>
           <h3 className="relative mt-5 font-display text-2xl">{p.label}</h3>
-          <p className="relative mt-1 text-xs uppercase tracking-[0.24em] text-cream/45">Official store</p>
+          <p className="relative mt-1 text-xs uppercase tracking-[0.24em] text-cream/45">
+            Official store
+          </p>
           <span className="relative mt-6 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-cream/70">
             Visit
-            <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+            <span className="transition-transform duration-300 group-hover:translate-x-1">
+              →
+            </span>
           </span>
         </motion.a>
       ))}
