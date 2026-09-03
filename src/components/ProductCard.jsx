@@ -199,82 +199,83 @@ export default function ProductCard({ product, index = 0, priority = false }) {
       }}
       className="group relative"
     >
-      <Link href={`/product/${product.slug}`} className="block">
-        <div className="relative overflow-hidden rounded-[26px] border border-white/8 bg-ink-3">
-          <div className="relative aspect-[3/4] w-full overflow-hidden">
-            {primary ? (
-              <>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={primary}
-                  alt={product.name}
-                  loading={priority ? "eager" : "lazy"}
-                  className="absolute inset-0 h-full w-full object-cover transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.08] group-hover:opacity-0"
-                />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={secondary}
-                  alt=""
-                  aria-hidden="true"
-                  loading="lazy"
-                  className="absolute inset-0 h-full w-full scale-105 object-cover opacity-0 transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-100 group-hover:opacity-100"
-                />
-              </>
-            ) : (
-              <div className="flex h-full items-center justify-center text-4xl">
-                👗
-              </div>
+      <div className="relative overflow-hidden rounded-[26px] border border-white/8 bg-ink-3">
+        <Link
+          href={`/product/${product.slug}`}
+          className="block relative aspect-[3/4] w-full overflow-hidden"
+        >
+          {primary ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={primary}
+                alt={product.name}
+                loading={priority ? "eager" : "lazy"}
+                className="absolute inset-0 h-full w-full object-cover transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.08] group-hover:opacity-0"
+              />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={secondary}
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                className="absolute inset-0 h-full w-full scale-105 object-cover opacity-0 transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-100 group-hover:opacity-100"
+              />
+            </>
+          ) : (
+            <div className="flex h-full items-center justify-center text-4xl">
+              👗
+            </div>
+          )}
+
+          <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/10 to-transparent opacity-80" />
+
+          <div className="absolute left-4 top-4 flex flex-col gap-2">
+            {discount > 0 && (
+              <span
+                className="rounded-full px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.16em] text-ink"
+                style={{ background: "var(--grad)" }}
+              >
+                {discount}% off
+              </span>
             )}
+            {product.badge && (
+              <span className="rounded-full border border-white/20 bg-ink/60 px-3 py-1 text-[0.6rem] uppercase tracking-[0.16em] text-cream/80 backdrop-blur">
+                {product.badge}
+              </span>
+            )}
+          </div>
+        </Link>
 
-            <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/10 to-transparent opacity-80" />
-
-            <div className="absolute left-4 top-4 flex flex-col gap-2">
-              {discount > 0 && (
-                <span
-                  className="rounded-full px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.16em] text-ink"
-                  style={{ background: "var(--grad)" }}
+        {/* Action buttons are now OUTSIDE the Link tag to fix mobile deep linking */}
+        <div className="pointer-events-none absolute inset-x-4 bottom-4 translate-y-3 opacity-0 transition-all duration-500 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 z-20">
+          <div className="flex flex-wrap gap-1.5">
+            {links.map((link) => {
+              const meta = platformMeta(link.platform);
+              const targetUrl = cleanMarketplaceUrl(link.url, link.platform);
+              return (
+                <a
+                  key={link.platform}
+                  href={targetUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => {
+                    trackAndOpen({
+                      product,
+                      platform: link.platform,
+                      url: link.url,
+                    });
+                  }}
+                  className="btn-shine inline-block rounded-full px-3 py-2 text-center text-[0.58rem] font-bold uppercase tracking-[0.16em] text-ink shadow-lg pointer-events-auto"
+                  style={{ background: meta.gradient }}
                 >
-                  {discount}% off
-                </span>
-              )}
-              {product.badge && (
-                <span className="rounded-full border border-white/20 bg-ink/60 px-3 py-1 text-[0.6rem] uppercase tracking-[0.16em] text-cream/80 backdrop-blur">
-                  {product.badge}
-                </span>
-              )}
-            </div>
-
-            <div className="pointer-events-none absolute inset-x-4 bottom-4 translate-y-3 opacity-0 transition-all duration-500 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
-              <div className="flex flex-wrap gap-1.5">
-                {links.map((link) => {
-                  const meta = platformMeta(link.platform);
-                  return (
-                    <a
-                      key={link.platform}
-                      href={cleanMarketplaceUrl(link.url, link.platform)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => {
-                        // We NO LONGER preventDefault.
-                        // The browser follows the href naturally while this runs in the background.
-                        trackAndOpen({
-                          product,
-                          platform: link.platform,
-                          url: link.url,
-                        });
-                      }}
-                      className="btn-shine inline-block rounded-full px-3 py-2 text-center text-[0.58rem] font-bold uppercase tracking-[0.16em] text-ink shadow-lg"
-                      style={{ background: meta.gradient }}
-                    >
-                      {meta.label}
-                    </a>
-                  );
-                })}
-              </div>
-            </div>
+                  {meta.label}
+                </a>
+              );
+            })}
           </div>
         </div>
-      </Link>
+      </div>
 
       <div className="mt-4 space-y-2">
         <div className="flex items-start justify-between gap-3">

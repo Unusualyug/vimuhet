@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { PLATFORMS, formatINR, platformMeta } from "@/lib/constants";
 import { trackAndOpen, cleanMarketplaceUrl } from "@/lib/client-utils";
@@ -28,9 +27,9 @@ export function BuyButtons({ product, layout = "stack" }) {
             href={targetUrl}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() =>
-              trackAndOpen({ product, platform: link.platform, url: link.url })
-            }
+            onClick={() => {
+              trackAndOpen({ product, platform: link.platform, url: link.url });
+            }}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -40,7 +39,7 @@ export function BuyButtons({ product, layout = "stack" }) {
             }}
             whileHover={{ y: -3, scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
-            className="btn-shine group relative flex w-full items-center justify-between gap-4 overflow-hidden rounded-2xl border border-white/10 px-5 py-4 text-left"
+            className="btn-shine group relative flex w-full items-center justify-between gap-4 overflow-hidden rounded-2xl border border-white/10 px-5 py-4 text-left cursor-pointer"
             style={{ background: meta.soft }}
           >
             <span className="relative z-10 flex items-center gap-3">

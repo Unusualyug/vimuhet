@@ -119,11 +119,10 @@ export function deviceType() {
   return "desktop";
 }
 
-/** Clean Amazon links to standard /dp/ASIN format with affiliate tag */
+/** Automatically cleans Amazon links to standard /dp/ASIN format with affiliate tag */
 export function cleanMarketplaceUrl(url = "", platform = "") {
   if (!url) return "#";
 
-  // If it is already a smart link (OpenInApp / UrlGenius), return it as-is without changing it!
   if (
     url.includes("openinapp") ||
     url.includes("urlgeni.us") ||
@@ -132,7 +131,6 @@ export function cleanMarketplaceUrl(url = "", platform = "") {
     return url;
   }
 
-  // If it's a raw Amazon link, clean it to standard /dp/ASIN with affiliate tag
   if (platform === "amazon" || url.includes("amazon.")) {
     const asinMatch = url.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
     if (asinMatch && asinMatch[1]) {
