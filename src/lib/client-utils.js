@@ -93,6 +93,7 @@
 //     fallback();
 //   }
 // }
+
 "use client";
 
 const KEY = "vimuhet_session_id";
@@ -170,11 +171,8 @@ export function trackAndOpen({ product, platform, url, onDone }) {
   const isMobile = deviceType() === "mobile";
 
   if (isMobile) {
-    // Navigating directly on mobile allows iOS Universal Links & Android App Links
-    // to open the product directly inside the installed app.
     window.location.href = cleanUrl;
   } else {
-    // Desktop: Open in a new tab
     window.open(cleanUrl, "_blank", "noopener,noreferrer");
   }
 }
