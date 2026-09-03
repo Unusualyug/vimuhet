@@ -340,7 +340,7 @@ export default function ProductDetail({ product }) {
         </motion.div>
       </div>
 
-      {/* mobile sticky buy bar */}
+      {/* mobile sticky buy bar - FIXED: Removed e.preventDefault() and target="_blank" */}
       <div className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-ink/95 px-4 py-3 backdrop-blur-xl lg:hidden">
         <div className="flex items-center gap-3">
           <div className="min-w-0">
@@ -351,15 +351,8 @@ export default function ProductDetail({ product }) {
           </div>
           {best && (
             <a
-              href={
-                best.platform === "amazon"
-                  ? cleanMarketplaceUrl(best.url, "amazon")
-                  : best.url
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => {
-                e.preventDefault();
+              href={cleanMarketplaceUrl(best.url, best.platform)}
+              onClick={() => {
                 setPulse(best.platform);
                 trackAndOpen({
                   product,
