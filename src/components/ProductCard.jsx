@@ -255,7 +255,8 @@ export default function ProductCard({ product, index = 0, priority = false }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => {
-                        // Only track analytics, let native browser handle hyperlink tap
+                        // We NO LONGER preventDefault.
+                        // The browser follows the href naturally while this runs in the background.
                         trackAndOpen({
                           product,
                           platform: link.platform,

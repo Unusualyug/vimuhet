@@ -96,67 +96,43 @@
 
 "use client";
 
-const KEY = "vimuhet_session_id";
-
-export function sessionId() {
-  if (typeof window === "undefined") return "";
-  try {
-    let id = window.localStorage.getItem(KEY);
-    if (!id) {
-      id = `s_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36)}`;
-      window.localStorage.setItem(KEY, id);
-    }
-    return id;
-  } catch {
-    return "anon";
-  }
-}
-
 export function deviceType() {
-  if (typeof window === "undefined") return "";
+  if (typeof window === "undefined") return "desktop";
   if (/mobile|android|iphone/i.test(navigator.userAgent)) return "mobile";
-  if (/ipad|tablet/i.test(navigator.userAgent)) return "tablet";
   return "desktop";
 }
 
-/** Clean Amazon links to standard /dp/ASIN format with affiliate tag */
 export function cleanMarketplaceUrl(url = "", platform = "") {
   if (!url) return "#";
+  // If it's already a smart link (OpenInApp), don't touch it
+  if (url.includes("openinapp") || url.includes("urlgeni.us")) return url;
 
+  // If it's a raw Amazon link, clean it and add your tag
   if (platform === "amazon" || url.includes("amazon.")) {
     const asinMatch = url.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
     if (asinMatch && asinMatch[1]) {
       return `https://www.amazon.in/dp/${asinMatch[1]}?tag=vimuhet-21`;
     }
   }
-
   return url;
 }
 
-/** Logs click analytics in background without blocking natural hyperlink navigation */
 export function trackAndOpen({ product, platform, url }) {
-  try {
-    const payload = JSON.stringify({
-      productId: product?.id,
-      productName: product?.name,
-      platform,
-      price: product?.price || 0,
-      sessionId: sessionId(),
-      referrer: typeof document !== "undefined" ? document.referrer : "",
-    });
+  // We only do analytics here now. No more window.location navigation!
+  const payload = JSON.stringify({
+    productId: product?.id,
+    platform,
+    timestamp: Date.now(),
+  });
 
+  try {
     if (typeof navigator !== "undefined" && navigator.sendBeacon) {
-      const blob = new Blob([payload], { type: "application/json" });
-      navigator.sendBeacon("/api/track/click", blob);
-    } else {
-      fetch("/api/track/click", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: payload,
-        keepalive: true,
-      });
+      navigator.sendBeacon(
+        "/api/track/click",
+        new Blob([payload], { type: "application/json" }),
+      );
     }
-  } catch {
-    /* never block the shopper */
+  } catch (e) {
+    console.error(e);
   }
 }
