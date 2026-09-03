@@ -5,11 +5,19 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { BuyButtons } from "@/components/PlatformButtons";
 import { Reveal } from "@/components/Motion";
-import { categoryLabel, discountPercent, formatINR, platformMeta } from "@/lib/constants";
-import { trackAndOpen } from "@/lib/client-utils";
+import {
+  categoryLabel,
+  discountPercent,
+  formatINR,
+  platformMeta,
+} from "@/lib/constants";
+import { trackAndOpen, cleanMarketplaceUrl } from "@/lib/client-utils";
 
 export default function ProductDetail({ product }) {
-  const images = useMemo(() => (product.images || []).filter(Boolean), [product.images]);
+  const images = useMemo(
+    () => (product.images || []).filter(Boolean),
+    [product.images],
+  );
   const [active, setActive] = useState(0);
   const [size, setSize] = useState(product.sizes?.[0] || "");
   const [zoom, setZoom] = useState({ on: false, x: 50, y: 50 });
@@ -17,11 +25,17 @@ export default function ProductDetail({ product }) {
   const [pulse, setPulse] = useState("");
 
   const discount = discountPercent(product.price, product.originalPrice);
-  const best = [...(product.links || [])].sort((a, b) => (a.price || 0) - (b.price || 0))[0];
+  const best = [...(product.links || [])].sort(
+    (a, b) => (a.price || 0) - (b.price || 0),
+  )[0];
   const bestMeta = best ? platformMeta(best.platform) : null;
 
   const panes = [
-    { key: "details", label: "Product story", body: product.description || "—" },
+    {
+      key: "details",
+      label: "Product story",
+      body: product.description || "—",
+    },
     {
       key: "fabric",
       label: "Fabric & care",
@@ -41,7 +55,10 @@ export default function ProductDetail({ product }) {
           Home
         </Link>
         <span>/</span>
-        <Link href={`/shop?category=${product.category}`} className="hover:text-cream">
+        <Link
+          href={`/shop?category=${product.category}`}
+          className="hover:text-cream"
+        >
           {categoryLabel(product.category)}
         </Link>
         <span>/</span>
@@ -104,7 +121,9 @@ export default function ProductDetail({ product }) {
               <button
                 type="button"
                 aria-label="Previous image"
-                onClick={() => setActive((a) => (a - 1 + images.length) % images.length)}
+                onClick={() =>
+                  setActive((a) => (a - 1 + images.length) % images.length)
+                }
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-ink/50 text-cream/80 backdrop-blur transition hover:bg-ink/80"
               >
                 ‹
@@ -129,7 +148,9 @@ export default function ProductDetail({ product }) {
                 type="button"
                 onClick={() => setActive(i)}
                 className={`relative h-24 w-20 shrink-0 overflow-hidden rounded-xl border transition-all duration-300 ${
-                  i === active ? "border-gold" : "border-white/12 opacity-65 hover:opacity-100"
+                  i === active
+                    ? "border-gold"
+                    : "border-white/12 opacity-65 hover:opacity-100"
                 }`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -145,33 +166,52 @@ export default function ProductDetail({ product }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
         >
-          <h1 className="font-display text-4xl leading-[1.05] sm:text-5xl">{product.name}</h1>
+          <h1 className="font-display text-4xl leading-[1.05] sm:text-5xl">
+            {product.name}
+          </h1>
           {product.tagline && (
-            <p className="mt-3 text-sm uppercase tracking-[0.22em] text-gold/80">{product.tagline}</p>
+            <p className="mt-3 text-sm uppercase tracking-[0.22em] text-gold/80">
+              {product.tagline}
+            </p>
           )}
 
           <div className="mt-5 flex items-center gap-3 text-sm">
-            <span className="text-gold">{"★".repeat(Math.round((product.rating || 48) / 10))}</span>
-            <span className="text-cream/40">{((product.rating || 48) / 10).toFixed(1)} / 5</span>
+            <span className="text-gold">
+              {"★".repeat(Math.round((product.rating || 48) / 10))}
+            </span>
+            <span className="text-cream/40">
+              {((product.rating || 48) / 10).toFixed(1)} / 5
+            </span>
             <span className="h-1 w-1 rounded-full bg-cream/30" />
-            <span className="text-cream/40">{product.inStock ? "In stock" : "Sold out"}</span>
+            <span className="text-cream/40">
+              {product.inStock ? "In stock" : "Sold out"}
+            </span>
           </div>
 
           <div className="mt-7 flex flex-wrap items-end gap-4 border-y border-white/10 py-6">
-            <span className="font-display text-5xl">{formatINR(product.price)}</span>
+            <span className="font-display text-5xl">
+              {formatINR(product.price)}
+            </span>
             {Number(product.originalPrice) > Number(product.price) && (
-              <span className="pb-2 text-xl text-cream/35 line-through">{formatINR(product.originalPrice)}</span>
+              <span className="pb-2 text-xl text-cream/35 line-through">
+                {formatINR(product.originalPrice)}
+              </span>
             )}
             {discount > 0 && (
               <span className="mb-2 rounded-full bg-mint/10 px-3 py-1 text-[0.62rem] uppercase tracking-[0.2em] text-mint">
-                Save {formatINR(Number(product.originalPrice) - Number(product.price))}
+                Save{" "}
+                {formatINR(
+                  Number(product.originalPrice) - Number(product.price),
+                )}
               </span>
             )}
           </div>
 
           {product.sizes?.length > 0 && (
             <div className="mt-7">
-              <p className="text-[0.6rem] uppercase tracking-[0.3em] text-cream/40">Select size</p>
+              <p className="text-[0.6rem] uppercase tracking-[0.3em] text-cream/40">
+                Select size
+              </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {product.sizes.map((s) => (
                   <button
@@ -179,7 +219,9 @@ export default function ProductDetail({ product }) {
                     type="button"
                     onClick={() => setSize(s)}
                     className={`relative rounded-xl border px-4 py-2.5 text-xs uppercase tracking-[0.16em] transition-colors ${
-                      size === s ? "text-ink" : "border-white/12 text-cream/65 hover:border-gold/60 hover:text-cream"
+                      size === s
+                        ? "text-ink"
+                        : "border-white/12 text-cream/65 hover:border-gold/60 hover:text-cream"
                     }`}
                   >
                     {size === s && (
@@ -187,7 +229,11 @@ export default function ProductDetail({ product }) {
                         layoutId="sizePill"
                         className="absolute inset-0 rounded-xl"
                         style={{ background: "var(--grad)" }}
-                        transition={{ type: "spring", stiffness: 340, damping: 28 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 340,
+                          damping: 28,
+                        }}
                       />
                     )}
                     <span className="relative z-10">{s}</span>
@@ -195,31 +241,42 @@ export default function ProductDetail({ product }) {
                 ))}
               </div>
               {size && (
-                <p className="mt-2 text-[0.62rem] uppercase tracking-[0.2em] text-mint">Size {size} selected</p>
+                <p className="mt-2 text-[0.62rem] uppercase tracking-[0.2em] text-mint">
+                  Size {size} selected
+                </p>
               )}
             </div>
           )}
 
           {product.colors?.length > 0 && (
             <div className="mt-6">
-              <p className="text-[0.6rem] uppercase tracking-[0.3em] text-cream/40">Colour</p>
-              <p className="mt-2 text-sm text-cream/70">{product.colors.join(" · ")}</p>
+              <p className="text-[0.6rem] uppercase tracking-[0.3em] text-cream/40">
+                Colour
+              </p>
+              <p className="mt-2 text-sm text-cream/70">
+                {product.colors.join(" · ")}
+              </p>
             </div>
           )}
 
           <div className="mt-9">
             <div className="mb-3 flex items-center justify-between">
-              <p className="text-[0.6rem] uppercase tracking-[0.3em] text-cream/40">Buy on your favourite app</p>
+              <p className="text-[0.6rem] uppercase tracking-[0.3em] text-cream/40">
+                Buy on your favourite app
+              </p>
               {bestMeta && (
                 <p className="text-[0.6rem] uppercase tracking-[0.2em] text-cream/35">
-                  Best price: <span style={{ color: bestMeta.color }}>{bestMeta.label}</span>
+                  Best price:{" "}
+                  <span style={{ color: bestMeta.color }}>
+                    {bestMeta.label}
+                  </span>
                 </p>
               )}
             </div>
             <BuyButtons product={product} />
             <p className="mt-3 text-[0.62rem] leading-relaxed text-cream/35">
-              Tapping a store button opens the VIMUHET listing inside the Amazon / Flipkart / Meesho app (or their
-              website on desktop).
+              Tapping a store button opens the VIMUHET listing inside the Amazon
+              / Flipkart / Meesho app (or their website on desktop).
             </p>
           </div>
 
@@ -227,14 +284,20 @@ export default function ProductDetail({ product }) {
             {panes.map((pane) => {
               const open = openPane === pane.key;
               return (
-                <div key={pane.key} className="overflow-hidden rounded-2xl border border-white/10 bg-ink-2/50">
+                <div
+                  key={pane.key}
+                  className="overflow-hidden rounded-2xl border border-white/10 bg-ink-2/50"
+                >
                   <button
                     type="button"
                     onClick={() => setOpenPane(open ? "" : pane.key)}
                     className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-sm text-cream/80"
                   >
                     {pane.label}
-                    <motion.span animate={{ rotate: open ? 45 : 0 }} className="text-gold">
+                    <motion.span
+                      animate={{ rotate: open ? 45 : 0 }}
+                      className="text-gold"
+                    >
                       +
                     </motion.span>
                   </button>
@@ -246,7 +309,9 @@ export default function ProductDetail({ product }) {
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                       >
-                        <p className="px-5 pb-5 text-sm leading-relaxed text-cream/55">{pane.body}</p>
+                        <p className="px-5 pb-5 text-sm leading-relaxed text-cream/55">
+                          {pane.body}
+                        </p>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -261,9 +326,14 @@ export default function ProductDetail({ product }) {
               { icon: "🔁", label: "Easy returns" },
               { icon: "✅", label: "Genuine product" },
             ].map((item) => (
-              <div key={item.label} className="rounded-2xl border border-white/8 bg-ink-2/40 px-2 py-4">
+              <div
+                key={item.label}
+                className="rounded-2xl border border-white/8 bg-ink-2/40 px-2 py-4"
+              >
                 <span className="text-xl">{item.icon}</span>
-                <p className="mt-2 text-[0.58rem] uppercase tracking-[0.18em] text-cream/45">{item.label}</p>
+                <p className="mt-2 text-[0.58rem] uppercase tracking-[0.18em] text-cream/45">
+                  {item.label}
+                </p>
               </div>
             ))}
           </div>
@@ -274,21 +344,34 @@ export default function ProductDetail({ product }) {
       <div className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-ink/95 px-4 py-3 backdrop-blur-xl lg:hidden">
         <div className="flex items-center gap-3">
           <div className="min-w-0">
-            <p className="truncate text-[0.6rem] uppercase tracking-[0.2em] text-cream/40">{size || "Select size"}</p>
+            <p className="truncate text-[0.6rem] uppercase tracking-[0.2em] text-cream/40">
+              {size || "Select size"}
+            </p>
             <p className="font-display text-xl">{formatINR(product.price)}</p>
           </div>
           {best && (
-            <button
-              type="button"
-              onClick={() => {
+            <a
+              href={
+                best.platform === "amazon"
+                  ? cleanMarketplaceUrl(best.url, "amazon")
+                  : best.url
+              }
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => {
+                e.preventDefault();
                 setPulse(best.platform);
-                trackAndOpen({ product, platform: best.platform, url: best.url });
+                trackAndOpen({
+                  product,
+                  platform: best.platform,
+                  url: best.url,
+                });
               }}
-              className="btn-shine ml-auto flex-1 rounded-full px-6 py-3.5 text-[0.64rem] font-bold uppercase tracking-[0.2em] text-ink"
+              className="btn-shine ml-auto flex-1 rounded-full px-6 py-3.5 text-[0.64rem] font-bold uppercase tracking-[0.2em] text-ink text-center"
               style={{ background: bestMeta.gradient }}
             >
               Buy on {bestMeta.label}
-            </button>
+            </a>
           )}
         </div>
         {pulse && <span className="sr-only">Opening {pulse}</span>}
@@ -297,13 +380,27 @@ export default function ProductDetail({ product }) {
       <Reveal>
         <div className="mt-20 grid gap-4 sm:grid-cols-3">
           {[
-            { t: "Compare before you tap", c: "Every listing shows the price on each marketplace so you never overpay." },
-            { t: "No fake stock counts", c: "We only link to live VIMUHET listings on the official storefronts." },
-            { t: "Same product, best route", c: "Choose Prime, Plus or Meesho Next-Day depending on how fast you need it." },
+            {
+              t: "Compare before you tap",
+              c: "Every listing shows the price on each marketplace so you never overpay.",
+            },
+            {
+              t: "No fake stock counts",
+              c: "We only link to live VIMUHET listings on the official storefronts.",
+            },
+            {
+              t: "Same product, best route",
+              c: "Choose Prime, Plus or Meesho Next-Day depending on how fast you need it.",
+            },
           ].map((item) => (
-            <div key={item.t} className="rounded-2xl border border-white/8 bg-ink-2/40 p-6">
+            <div
+              key={item.t}
+              className="rounded-2xl border border-white/8 bg-ink-2/40 p-6"
+            >
               <h4 className="font-display text-lg">{item.t}</h4>
-              <p className="mt-2 text-sm leading-relaxed text-cream/50">{item.c}</p>
+              <p className="mt-2 text-sm leading-relaxed text-cream/50">
+                {item.c}
+              </p>
             </div>
           ))}
         </div>

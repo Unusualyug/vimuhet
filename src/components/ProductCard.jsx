@@ -3,11 +3,19 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { PlatformDots } from "./PlatformButtons";
-import { categoryLabel, discountPercent, formatINR, platformMeta } from "@/lib/constants";
-import { trackAndOpen } from "@/lib/client-utils";
+import {
+  categoryLabel,
+  discountPercent,
+  formatINR,
+  platformMeta,
+} from "@/lib/constants";
+
+import { trackAndOpen, cleanMarketplaceUrl } from "@/lib/client-utils";
 
 export default function ProductCard({ product, index = 0, priority = false }) {
-  const images = Array.isArray(product.images) ? product.images.filter(Boolean) : [];
+  const images = Array.isArray(product.images)
+    ? product.images.filter(Boolean)
+    : [];
   const primary = images[0];
   const secondary = images[1] || images[0];
   const discount = discountPercent(product.price, product.originalPrice);
@@ -18,7 +26,11 @@ export default function ProductCard({ product, index = 0, priority = false }) {
       initial={{ opacity: 0, y: 34 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
-      transition={{ delay: (index % 4) * 0.07, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      transition={{
+        delay: (index % 4) * 0.07,
+        duration: 0.8,
+        ease: [0.16, 1, 0.3, 1],
+      }}
       className="group relative"
     >
       <Link href={`/product/${product.slug}`} className="block">
@@ -43,7 +55,9 @@ export default function ProductCard({ product, index = 0, priority = false }) {
                 />
               </>
             ) : (
-              <div className="flex h-full items-center justify-center text-4xl">👗</div>
+              <div className="flex h-full items-center justify-center text-4xl">
+                👗
+              </div>
             )}
 
             <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/10 to-transparent opacity-80" />
@@ -68,21 +82,49 @@ export default function ProductCard({ product, index = 0, priority = false }) {
               <div className="flex flex-wrap gap-1.5">
                 {links.map((link) => {
                   const meta = platformMeta(link.platform);
-                  return (
-                    <button
+                  return {
+                    /* <button
                       key={link.platform}
                       type="button"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        trackAndOpen({ product, platform: link.platform, url: link.url });
+                        trackAndOpen({
+                          product,
+                          platform: link.platform,
+                          url: link.url,
+                        });
                       }}
                       className="btn-shine rounded-full px-3 py-2 text-[0.58rem] font-bold uppercase tracking-[0.16em] text-ink shadow-lg"
                       style={{ background: meta.gradient }}
                     >
                       {meta.label}
-                    </button>
-                  );
+                    </button> */
+                  };
+
+                  <a
+                    key={link.platform}
+                    href={
+                      link.platform === "amazon"
+                        ? cleanMarketplaceUrl(link.url, "amazon")
+                        : link.url
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      trackAndOpen({
+                        product,
+                        platform: link.platform,
+                        url: link.url,
+                      });
+                    }}
+                    className="btn-shine rounded-full px-3 py-2 text-[0.58rem] font-bold uppercase tracking-[0.16em] text-ink shadow-lg inline-block text-center"
+                    style={{ background: meta.gradient }}
+                  >
+                    {meta.label}
+                  </a>;
                 })}
               </div>
             </div>
@@ -103,9 +145,13 @@ export default function ProductCard({ product, index = 0, priority = false }) {
           {categoryLabel(product.category)} · {product.fit}
         </p>
         <div className="flex items-baseline gap-3">
-          <span className="text-lg font-semibold text-cream">{formatINR(product.price)}</span>
+          <span className="text-lg font-semibold text-cream">
+            {formatINR(product.price)}
+          </span>
           {Number(product.originalPrice) > Number(product.price) && (
-            <span className="text-sm text-cream/35 line-through">{formatINR(product.originalPrice)}</span>
+            <span className="text-sm text-cream/35 line-through">
+              {formatINR(product.originalPrice)}
+            </span>
           )}
           <Link
             href={`/product/${product.slug}`}
