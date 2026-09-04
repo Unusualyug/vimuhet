@@ -1,44 +1,28 @@
+// src/app/api/out/route.js
+import { NextResponse } from "next/server";
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const rawUrl = searchParams.get("url");
+  let targetUrl = searchParams.get("url");
 
-  if (!rawUrl) {
-    return new Response("Missing URL", { status: 400 });
+  if (!targetUrl) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
-  let targetUrl = rawUrl;
-
-  // Format Amazon URLs to clean /dp/ASIN web format with your tag
-  if (targetUrl.includes("amazon.")) {
+  // Final sanity check for Amazon links
+  if (targetUrl.includes("amazon")) {
     const asinMatch = targetUrl.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
-    if (asinMatch && asinMatch[1]) {
-      targetUrl = `https://www.amazon.in/dp/${asinMatch[1]}?tag=vimuhet-21`;
+    if (asinMatch) {
+      targetUrl = `https://www.amazon.in/dp/${asinMatch[1]}?tag=vimuhet-21`; // tag is optional
     }
   }
 
-  // Returning an HTML response with window.location.replace forces mobile browsers
-  // (Chrome & Safari) to load the Web page inside the browser tab and BYPASS the native app!
-  const html = `
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Opening Amazon Web...</title>
-        <style>
-          body { background: #0b0b0e; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        </style>
-      </head>
-      <body>
-        <p>Opening product on Amazon Web...</p>
-        <script>
-          window.location.replace(${JSON.stringify(targetUrl)});
-        </script>
-      </body>
-    </html>
-  `;
-
-  return new Response(html, {
-    headers: { "Content-Type": "text/html; charset=utf-8" },
+  // The secret sauce: We send a 302 redirect directly from the server.
+  // This is much more stable for mobile apps than Javascript redirects.
+  return NextResponse.redirect(targetUrl, {
+    status: 302,
+    headers: {
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+    },
   });
 }

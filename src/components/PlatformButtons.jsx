@@ -6,6 +6,8 @@ import { trackAndOpen, cleanMarketplaceUrl } from "@/lib/client-utils";
 /** Marketplace buttons used on the product detail page */
 // src/components/PlatformButtons.jsx (BuyButtons component)
 
+// src/components/PlatformButtons.jsx
+
 export function BuyButtons({ product, layout = "stack" }) {
   const links = (product.links || []).filter((l) => l && l.url);
 
@@ -19,26 +21,17 @@ export function BuyButtons({ product, layout = "stack" }) {
     >
       {links.map((link, i) => {
         const meta = platformMeta(link.platform);
-        const price = Number(link.price || product.price || 0);
 
-        // Use our new cleaning function
-        const targetUrl = cleanMarketplaceUrl(link.url, link.platform);
+        // POINT TO YOUR API BRIDGE INSTEAD OF AMAZON
+        const bridgeUrl = `/api/out?url=${encodeURIComponent(link.url)}`;
 
         return (
           <a
             key={`${link.platform}-${i}`}
-            href={targetUrl}
-            // Removing e.preventDefault() often allows the browser to handle
-            // the link more naturally. If we want to force WEB, we do NOT
-            // use target="_blank" on some mobile browsers as that triggers the app.
-            onClick={() => {
-              trackAndOpen({
-                product,
-                platform: link.platform,
-                url: targetUrl,
-              });
-            }}
-            // Standard attributes to help with clean redirects
+            href={bridgeUrl}
+            // NO onClick logic needed here!
+            // The browser follows the link to your API,
+            // and the API handles the redirect.
             rel="noopener noreferrer"
             className="btn-shine group relative flex w-full items-center justify-between gap-4 overflow-hidden rounded-2xl border border-white/10 px-5 py-4 text-left cursor-pointer"
             style={{ background: meta.soft }}
@@ -54,27 +47,19 @@ export function BuyButtons({ product, layout = "stack" }) {
                 <span className="block text-sm font-semibold tracking-wide text-cream">
                   Buy on {meta.label}
                 </span>
-                <span className="block text-[0.68rem] uppercase tracking-[0.2em] text-cream/45">
-                  View Product Details
-                </span>
               </span>
             </span>
             <span className="relative z-10 text-right">
               <span className="block font-display text-lg text-cream">
-                {formatINR(price)}
+                ₹{link.price}
               </span>
             </span>
-            <span
-              className="absolute inset-0 -z-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-              style={{ background: meta.gradient, opacity: 0.16 }}
-            />
           </a>
         );
       })}
     </div>
   );
 }
-
 export function PlatformDots({ product }) {
   const links = (product.links || []).filter((l) => l && l.url);
   return (

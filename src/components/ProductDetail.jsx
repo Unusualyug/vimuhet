@@ -349,19 +349,10 @@ export default function ProductDetail({ product }) {
             </p>
             <p className="font-display text-xl">{formatINR(product.price)}</p>
           </div>
+
           {best && (
             <a
-              href={cleanMarketplaceUrl(best.url, best.platform)}
-              onClick={() => {
-                // Just track it, don't use e.preventDefault() here.
-                // Let the natural 'href' handle the navigation.
-                trackAndOpen({
-                  product,
-                  platform: best.platform,
-                  url: cleanMarketplaceUrl(best.url, best.platform),
-                });
-              }}
-              // Ensuring the link is clean is the most important part
+              href={`/api/out?url=${encodeURIComponent(best.url)}`}
               className="btn-shine ml-auto flex-1 rounded-full px-6 py-3.5 text-[0.64rem] font-bold uppercase tracking-[0.2em] text-ink text-center"
               style={{ background: bestMeta.gradient }}
             >
