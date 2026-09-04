@@ -165,31 +165,45 @@
 //   );
 // }
 // src/components/ProductCard.jsx
+// src/components/ProductCard.jsx
 "use client";
+
+import Link from "next/link";
 import { trackAndOpen } from "@/lib/client-utils";
 
 export default function ProductCard({ product }) {
-  // Find the amazon link from the product links array
+  // 1. Find the Amazon link from your links array
   const amazonLink = product.links?.find((l) => l.platform === "amazon")?.url;
 
-  // Create the bridge URL
-  const bridgeUrl = `/api/out?url=${encodeURIComponent(amazonLink)}`;
+  // 2. Create the Bridge URL (This ensures the Amazon App Home Page bug is fixed)
+  const bridgeUrl = amazonLink
+    ? `/api/out?url=${encodeURIComponent(amazonLink)}`
+    : `/product/${product.slug}`; // Fallback if no link exists
 
   return (
-    <div className="product-card">
+    <div className="group relative">
       {/* 
-         If you want to skip the detail page, point this href 
-         to the bridgeUrl instead of /product/[slug] 
+         CHANGE: We point the href to bridgeUrl instead of the slug page.
+         This will take them directly to Amazon via your API bridge.
       */}
       <a
         href={bridgeUrl}
-        onClick={() =>
-          trackAndOpen({ product, platform: "amazon", url: amazonLink })
-        }
+        onClick={() => {
+          if (amazonLink) {
+            trackAndOpen({ product, platform: "amazon", url: amazonLink });
+          }
+        }}
+        className="block"
       >
-        <img src={product.images[0]} alt={product.name} />
-        <h3>{product.name}</h3>
-        <p>Buy from Amazon</p>
+        <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-ink-3">
+          {/* Your Image Code here */}
+          <img src={product.images[0]} alt={product.name} className="..." />
+        </div>
+
+        <div className="mt-4">
+          <h3 className="font-display text-lg">{product.name}</h3>
+          <p className="text-sm text-gold">Buy on Amazon →</p>
+        </div>
       </a>
     </div>
   );
