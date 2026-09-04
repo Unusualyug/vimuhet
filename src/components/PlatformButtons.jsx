@@ -4,6 +4,8 @@ import { PLATFORMS, formatINR, platformMeta } from "@/lib/constants";
 import { trackAndOpen, cleanMarketplaceUrl } from "@/lib/client-utils";
 
 /** Marketplace buttons used on the product detail page */
+// src/components/PlatformButtons.jsx (BuyButtons component)
+
 export function BuyButtons({ product, layout = "stack" }) {
   const links = (product.links || []).filter((l) => l && l.url);
 
@@ -18,20 +20,26 @@ export function BuyButtons({ product, layout = "stack" }) {
       {links.map((link, i) => {
         const meta = platformMeta(link.platform);
         const price = Number(link.price || product.price || 0);
+
+        // Use our new cleaning function
         const targetUrl = cleanMarketplaceUrl(link.url, link.platform);
 
         return (
           <a
             key={`${link.platform}-${i}`}
             href={targetUrl}
-            onClick={(e) => {
-              // 1. Prevent mobile OS from intercepting link for native app launch
-              e.preventDefault();
-              // 2. Track click analytics
-              trackAndOpen({ product, platform: link.platform, url: link.url });
-              // 3. Force mobile browser (Chrome/Safari) to load web page directly
-              window.location.href = targetUrl;
+            // Removing e.preventDefault() often allows the browser to handle
+            // the link more naturally. If we want to force WEB, we do NOT
+            // use target="_blank" on some mobile browsers as that triggers the app.
+            onClick={() => {
+              trackAndOpen({
+                product,
+                platform: link.platform,
+                url: targetUrl,
+              });
             }}
+            // Standard attributes to help with clean redirects
+            rel="noopener noreferrer"
             className="btn-shine group relative flex w-full items-center justify-between gap-4 overflow-hidden rounded-2xl border border-white/10 px-5 py-4 text-left cursor-pointer"
             style={{ background: meta.soft }}
           >
@@ -47,7 +55,7 @@ export function BuyButtons({ product, layout = "stack" }) {
                   Buy on {meta.label}
                 </span>
                 <span className="block text-[0.68rem] uppercase tracking-[0.2em] text-cream/45">
-                  Opens web store
+                  View Product Details
                 </span>
               </span>
             </span>

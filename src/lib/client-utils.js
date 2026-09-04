@@ -120,34 +120,32 @@ export function deviceType() {
 }
 
 /** Forces link through our JS-replace web endpoint to suppress native app launches */
-export function cleanMarketplaceUrl(url = "", platform = "") {
+// src/lib/client-utils.js
+
+export function cleanMarketplaceUrl(url, platform) {
   if (!url) return "#";
-  return `/api/out?url=${encodeURIComponent(url)}&platform=${platform}`;
-}
 
-export function trackAndOpen({ product, platform, url }) {
-  try {
-    const payload = JSON.stringify({
-      productId: product?.id,
-      productName: product?.name,
-      platform,
-      price: product?.price || 0,
-      sessionId: sessionId(),
-      referrer: typeof document !== "undefined" ? document.referrer : "",
-    });
-
-    if (typeof navigator !== "undefined" && navigator.sendBeacon) {
-      const blob = new Blob([payload], { type: "application/json" });
-      navigator.sendBeacon("/api/track/click", blob);
-    } else {
-      fetch("/api/track/click", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: payload,
-        keepalive: true,
-      });
+  if (platform === "amazon") {
+    // This regex looks for the 10-character Amazon ASIN (e.g., B0C1234567)
+    const asinMatch = url.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/);
+    if (asinMatch && asinMatch[1]) {
+      const asin = asinMatch[1];
+      // This is the "Cleanest" possible Amazon link.
+      // Adding ?tag= is optional for affiliates, but keeping it simple
+      // ensures the App or Web opens the specific product.
+      return `https://www.amazon.in/dp/${asin}`;
     }
-  } catch {
-    /* ignore */
   }
+
+  // For Flipkart, we just want the /p/ or /dl/ link without the tracking garbage
+  if (platform === "flipkart") {
+    const pidMatch = url.match(/pid=([A-Z0-9]{16})/);
+    if (pidMatch) {
+      // Keep only the base URL and the product ID
+      const baseUrl = url.split("?")[0];
+      return `${baseUrl}?pid=${pidMatch[1]}`;
+    }
+  }
+
+  return url;
 }
