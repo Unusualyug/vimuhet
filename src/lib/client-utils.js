@@ -119,29 +119,14 @@ export function deviceType() {
   return "desktop";
 }
 
-/** Automatically cleans Amazon links to standard /dp/ASIN format with affiliate tag */
+/** Routes product links through our server 307 redirect API for native mobile deep-linking */
 export function cleanMarketplaceUrl(url = "", platform = "") {
   if (!url) return "#";
 
-  if (
-    url.includes("openinapp") ||
-    url.includes("urlgeni.us") ||
-    url.includes("amzn.openinapp.co")
-  ) {
-    return url;
-  }
-
-  if (platform === "amazon" || url.includes("amazon.")) {
-    const asinMatch = url.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
-    if (asinMatch && asinMatch[1]) {
-      return `https://www.amazon.in/dp/${asinMatch[1]}?tag=vimuhet-21`;
-    }
-  }
-
-  return url;
+  return `/api/out?url=${encodeURIComponent(url)}&platform=${platform}`;
 }
 
-/** Logs click analytics in background without blocking natural hyperlink navigation */
+/** Logs click analytics in background */
 export function trackAndOpen({ product, platform, url }) {
   try {
     const payload = JSON.stringify({
