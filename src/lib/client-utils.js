@@ -96,8 +96,11 @@
 
 "use client";
 
-// Internal helper for sessions
-function getSessionId() {
+/**
+ * 1. SESSION & DEVICE HELPERS
+ * Needed by VisitTracker.jsx and analytics
+ */
+export function sessionId() {
   if (typeof window === "undefined") return "";
   const key = "vimuhet_sid";
   let id = localStorage.getItem(key);
@@ -108,9 +111,8 @@ function getSessionId() {
   return id;
 }
 
-// Internal helper for device detection
-function deviceLabel() {
-  if (typeof navigator === "undefined") return "";
+export function deviceType() {
+  if (typeof navigator === "undefined") return "desktop";
   const ua = navigator.userAgent || "";
   if (/iPhone|iPad|iPod/i.test(ua)) return "ios";
   if (/Android/i.test(ua)) return "android";
@@ -118,7 +120,8 @@ function deviceLabel() {
 }
 
 /**
- * Clean Amazon/Flipkart URLs to prevent Home Page redirect bug
+ * 2. AMAZON REDIRECT FIX
+ * Strips junk to ensure Amazon App opens the product, not home page.
  */
 export function cleanMarketplaceUrl(url, platform) {
   if (!url || typeof url !== "string") return "#";
@@ -126,20 +129,18 @@ export function cleanMarketplaceUrl(url, platform) {
   const raw = url.trim();
   const p = String(platform || "").toLowerCase();
 
-  // Amazon Cleaning Logic
   if (p === "amazon") {
+    // Look for the 10-character Amazon ASIN
     const asinMatch = raw.match(
       /\/(?:dp|gp\/product|gp\/aw\/d)\/([A-Z0-9]{10})/i,
     );
     const asin = asinMatch ? asinMatch[1] : null;
 
     if (asin) {
-      // Return the cleanest possible URL that the Amazon App understands
       return `https://www.amazon.in/dp/${asin.toUpperCase()}`;
     }
   }
 
-  // Flipkart Cleaning Logic
   if (p === "flipkart") {
     try {
       const u = new URL(raw.startsWith("http") ? raw : `https://${raw}`);
@@ -156,11 +157,10 @@ export function cleanMarketplaceUrl(url, platform) {
 }
 
 /**
- * Tracks the click in your DB and then handles the redirect
+ * 3. TRACKING LOGIC
  */
 export async function trackAndOpen({ product, platform, url }) {
   try {
-    // We clean the URL before sending to analytics
     const finalUrl = cleanMarketplaceUrl(url, platform);
 
     await fetch("/api/track/click", {
@@ -171,8 +171,8 @@ export async function trackAndOpen({ product, platform, url }) {
         productName: product?.name || "",
         platform,
         price: product?.price || 0,
-        sessionId: getSessionId(),
-        device: deviceLabel(),
+        sessionId: sessionId(),
+        device: deviceType(),
         referrer: typeof document !== "undefined" ? document.referrer : "",
         url: finalUrl,
       }),
