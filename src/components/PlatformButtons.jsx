@@ -3,7 +3,7 @@
 import { PLATFORMS, formatINR, platformMeta } from "@/lib/constants";
 import { trackAndOpen, cleanMarketplaceUrl } from "@/lib/client-utils";
 
-/** Big marketplace buttons used on the product detail page. */
+/** Marketplace buttons used on the product detail page */
 export function BuyButtons({ product, layout = "stack" }) {
   const links = (product.links || []).filter((l) => l && l.url);
 
@@ -21,12 +21,16 @@ export function BuyButtons({ product, layout = "stack" }) {
         const targetUrl = cleanMarketplaceUrl(link.url, link.platform);
 
         return (
-          /* Standard HTML <a> tag without Framer Motion or target="_blank" to match WhatsApp behavior */
           <a
             key={`${link.platform}-${i}`}
             href={targetUrl}
-            onClick={() => {
+            onClick={(e) => {
+              // 1. Prevent mobile OS from intercepting link for native app launch
+              e.preventDefault();
+              // 2. Track click analytics
               trackAndOpen({ product, platform: link.platform, url: link.url });
+              // 3. Force mobile browser (Chrome/Safari) to load web page directly
+              window.location.href = targetUrl;
             }}
             className="btn-shine group relative flex w-full items-center justify-between gap-4 overflow-hidden rounded-2xl border border-white/10 px-5 py-4 text-left cursor-pointer"
             style={{ background: meta.soft }}
@@ -43,7 +47,7 @@ export function BuyButtons({ product, layout = "stack" }) {
                   Buy on {meta.label}
                 </span>
                 <span className="block text-[0.68rem] uppercase tracking-[0.2em] text-cream/45">
-                  Opens app or website
+                  Opens web store
                 </span>
               </span>
             </span>
@@ -51,13 +55,6 @@ export function BuyButtons({ product, layout = "stack" }) {
               <span className="block font-display text-lg text-cream">
                 {formatINR(price)}
               </span>
-              {price !== Number(product.price) && (
-                <span className="block text-[0.62rem] uppercase tracking-[0.2em] text-cream/40">
-                  {price < Number(product.price)
-                    ? "lowest here"
-                    : "listed price"}
-                </span>
-              )}
             </span>
             <span
               className="absolute inset-0 -z-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
@@ -70,7 +67,6 @@ export function BuyButtons({ product, layout = "stack" }) {
   );
 }
 
-/** Compact platform strip used on product cards. */
 export function PlatformDots({ product }) {
   const links = (product.links || []).filter((l) => l && l.url);
   return (
@@ -93,7 +89,7 @@ export function PlatformDots({ product }) {
 export function PlatformStrip() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {PLATFORMS.map((p, i) => (
+      {PLATFORMS.map((p) => (
         <a
           key={p.key}
           href={p.url}
@@ -101,25 +97,12 @@ export function PlatformStrip() {
           style={{ background: p.soft }}
         >
           <span
-            className="absolute -right-10 -top-10 h-32 w-32 rounded-full opacity-40 blur-2xl transition-all duration-700 group-hover:scale-150"
-            style={{ background: p.gradient }}
-          />
-          <span
             className="relative flex h-12 w-12 items-center justify-center rounded-2xl text-sm font-bold text-ink"
             style={{ background: p.gradient }}
           >
             {p.short}
           </span>
           <h3 className="relative mt-5 font-display text-2xl">{p.label}</h3>
-          <p className="relative mt-1 text-xs uppercase tracking-[0.24em] text-cream/45">
-            Official store
-          </p>
-          <span className="relative mt-6 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-cream/70">
-            Visit
-            <span className="transition-transform duration-300 group-hover:translate-x-1">
-              →
-            </span>
-          </span>
         </a>
       ))}
     </div>

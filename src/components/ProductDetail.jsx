@@ -352,13 +352,20 @@ export default function ProductDetail({ product }) {
           {best && (
             <a
               href={cleanMarketplaceUrl(best.url, best.platform)}
-              onClick={() => {
+              onClick={(e) => {
+                // Prevent mobile OS from prompting "Open in App?"
+                e.preventDefault();
                 setPulse(best.platform);
                 trackAndOpen({
                   product,
                   platform: best.platform,
                   url: best.url,
                 });
+                // Force mobile browser to load Amazon Web page directly
+                window.location.href = cleanMarketplaceUrl(
+                  best.url,
+                  best.platform,
+                );
               }}
               className="btn-shine ml-auto flex-1 rounded-full px-6 py-3.5 text-[0.64rem] font-bold uppercase tracking-[0.2em] text-ink text-center"
               style={{ background: bestMeta.gradient }}
