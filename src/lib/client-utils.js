@@ -96,56 +96,89 @@
 
 "use client";
 
-const KEY = "vimuhet_session_id";
-
-export function sessionId() {
+// Internal helper for sessions
+function getSessionId() {
   if (typeof window === "undefined") return "";
-  try {
-    let id = window.localStorage.getItem(KEY);
-    if (!id) {
-      id = `s_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36)}`;
-      window.localStorage.setItem(KEY, id);
-    }
-    return id;
-  } catch {
-    return "anon";
+  const key = "vimuhet_sid";
+  let id = localStorage.getItem(key);
+  if (!id) {
+    id = crypto.randomUUID?.() || String(Date.now());
+    localStorage.setItem(key, id);
   }
+  return id;
 }
 
-export function deviceType() {
-  if (typeof window === "undefined") return "desktop";
-  if (/mobile|android|iphone/i.test(navigator.userAgent)) return "mobile";
-  if (/ipad|tablet/i.test(navigator.userAgent)) return "tablet";
+// Internal helper for device detection
+function deviceLabel() {
+  if (typeof navigator === "undefined") return "";
+  const ua = navigator.userAgent || "";
+  if (/iPhone|iPad|iPod/i.test(ua)) return "ios";
+  if (/Android/i.test(ua)) return "android";
   return "desktop";
 }
 
-/** Forces link through our JS-replace web endpoint to suppress native app launches */
-// src/lib/client-utils.js
-
+/**
+ * Clean Amazon/Flipkart URLs to prevent Home Page redirect bug
+ */
 export function cleanMarketplaceUrl(url, platform) {
-  if (!url) return "#";
+  if (!url || typeof url !== "string") return "#";
 
-  if (platform === "amazon") {
-    // This regex looks for the 10-character Amazon ASIN (e.g., B0C1234567)
-    const asinMatch = url.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/);
-    if (asinMatch && asinMatch[1]) {
-      const asin = asinMatch[1];
-      // This is the "Cleanest" possible Amazon link.
-      // Adding ?tag= is optional for affiliates, but keeping it simple
-      // ensures the App or Web opens the specific product.
-      return `https://www.amazon.in/dp/${asin}`;
+  const raw = url.trim();
+  const p = String(platform || "").toLowerCase();
+
+  // Amazon Cleaning Logic
+  if (p === "amazon") {
+    const asinMatch = raw.match(
+      /\/(?:dp|gp\/product|gp\/aw\/d)\/([A-Z0-9]{10})/i,
+    );
+    const asin = asinMatch ? asinMatch[1] : null;
+
+    if (asin) {
+      // Return the cleanest possible URL that the Amazon App understands
+      return `https://www.amazon.in/dp/${asin.toUpperCase()}`;
     }
   }
 
-  // For Flipkart, we just want the /p/ or /dl/ link without the tracking garbage
-  if (platform === "flipkart") {
-    const pidMatch = url.match(/pid=([A-Z0-9]{16})/);
-    if (pidMatch) {
-      // Keep only the base URL and the product ID
-      const baseUrl = url.split("?")[0];
-      return `${baseUrl}?pid=${pidMatch[1]}`;
+  // Flipkart Cleaning Logic
+  if (p === "flipkart") {
+    try {
+      const u = new URL(raw.startsWith("http") ? raw : `https://${raw}`);
+      const pid = u.searchParams.get("pid");
+      const path = u.pathname.replace(/\/+$/, "");
+      if (pid) return `https://www.flipkart.com${path}?pid=${pid}`;
+      return `https://www.flipkart.com${path}`;
+    } catch {
+      return raw.split("?")[0];
     }
   }
 
-  return url;
+  return raw;
+}
+
+/**
+ * Tracks the click in your DB and then handles the redirect
+ */
+export async function trackAndOpen({ product, platform, url }) {
+  try {
+    // We clean the URL before sending to analytics
+    const finalUrl = cleanMarketplaceUrl(url, platform);
+
+    await fetch("/api/track/click", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        productId: product?.id,
+        productName: product?.name || "",
+        platform,
+        price: product?.price || 0,
+        sessionId: getSessionId(),
+        device: deviceLabel(),
+        referrer: typeof document !== "undefined" ? document.referrer : "",
+        url: finalUrl,
+      }),
+      keepalive: true,
+    });
+  } catch (err) {
+    console.error("Tracking failed", err);
+  }
 }
