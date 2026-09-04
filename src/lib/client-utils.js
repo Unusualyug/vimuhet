@@ -119,21 +119,12 @@ export function deviceType() {
   return "desktop";
 }
 
-/** Formats Amazon URL to clean direct web product link with affiliate tag */
+/** Forces link through our JS-replace web endpoint to suppress native app launches */
 export function cleanMarketplaceUrl(url = "", platform = "") {
   if (!url) return "#";
-
-  if (platform === "amazon" || url.includes("amazon.")) {
-    const asinMatch = url.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
-    if (asinMatch && asinMatch[1]) {
-      return `https://www.amazon.in/dp/${asinMatch[1]}?tag=vimuhet-21`;
-    }
-  }
-
-  return url;
+  return `/api/out?url=${encodeURIComponent(url)}&platform=${platform}`;
 }
 
-/** Background analytics only */
 export function trackAndOpen({ product, platform, url }) {
   try {
     const payload = JSON.stringify({
@@ -144,6 +135,7 @@ export function trackAndOpen({ product, platform, url }) {
       sessionId: sessionId(),
       referrer: typeof document !== "undefined" ? document.referrer : "",
     });
+
     if (typeof navigator !== "undefined" && navigator.sendBeacon) {
       const blob = new Blob([payload], { type: "application/json" });
       navigator.sendBeacon("/api/track/click", blob);
