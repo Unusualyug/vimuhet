@@ -34,6 +34,47 @@
     line-height: 1.2;
   }
 
+  /* Search uses the whole compact header, so it never sits on top of the wordmark. */
+  .nav.search-active > .mobile,
+  .nav.search-active > .wordmark,
+  .nav.search-active .nav-actions > .bag {
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .nav.search-active .nav-actions {
+    position: static;
+  }
+  .nav.search-active .nav-actions .search.search-open {
+    position: absolute;
+    z-index: 30;
+    top: 50%;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    min-height: 45px;
+    margin: 0;
+    padding: 8px 10px;
+    transform: translateY(-50%);
+    background: #17121f;
+    border: 1px solid #765286;
+    box-shadow: 0 12px 28px #08050d99;
+  }
+  .nav.search-active .nav-actions .search.search-open input {
+    display: block;
+    min-width: 0;
+    font-size: 12px;
+    color: #f8eff8;
+  }
+  .nav.search-active .nav-actions .search.search-open .search-trigger {
+    flex: none;
+    color: #f59bc8;
+  }
+  .nav.search-active .search-suggestions {
+    right: 0;
+    left: 0;
+    width: auto;
+  }
+
   /* The hero is a complete, readable editorial panel—not a short image strip. */
   .hero-banner {
     height: clamp(520px, calc(100svh - 96px), 640px);

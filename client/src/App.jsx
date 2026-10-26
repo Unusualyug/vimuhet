@@ -574,7 +574,7 @@ function Header() {
       <div className="announcement">
         Clothing that moves with you. <span>✳</span> Free shipping over ₹2,499
       </div>
-      <header className="nav">
+      <header className={`nav${searchOpen ? " search-active" : ""}`}>
         <button
           className="icon mobile"
           onClick={() => setMenu(!menu)}
@@ -620,11 +620,11 @@ function Header() {
             <button
               type="button"
               className="search-trigger"
-              aria-label="Search products"
+              aria-label={searchOpen ? "Close search" : "Search products"}
               aria-expanded={searchOpen}
               onClick={() => setSearchOpen((v) => !v)}
             >
-              <Search size={17} />
+              {searchOpen ? <X size={18} /> : <Search size={17} />}
             </button>
             <input
               placeholder="Find your favourite…"
