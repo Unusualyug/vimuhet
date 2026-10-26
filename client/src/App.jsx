@@ -1607,7 +1607,9 @@ function ProductFeedback({ product }) {
             </span>
           </p>
         ) : (
-          <p className="feedback-summary">No published reviews yet.</p>
+          <p className="feedback-summary">
+            No published verified-purchase reviews yet.
+          </p>
         )}
       </div>
       {loadError ? (
@@ -1638,13 +1640,13 @@ function ProductFeedback({ product }) {
               ))
             ) : (
               <p className="feedback-empty">
-                Reviews will appear here only after a delivered purchaser
-                submits one and it is moderated.
+                No verified reviews yet. Published feedback from delivered
+                purchases will appear here.
               </p>
             )}
-            <details className="feedback-form">
-              <summary>Write a verified-purchase review</summary>
-              {token ? (
+            {token ? (
+              <details className="feedback-form">
+                <summary>Write a verified-purchase review</summary>
                 <form onSubmit={submitReview}>
                   <label>
                     Rating
@@ -1701,13 +1703,21 @@ function ProductFeedback({ product }) {
                     </p>
                   )}
                 </form>
-              ) : (
-                <p>
-                  <Link to="/account">Sign in</Link> with the account used for a
-                  delivered purchase to submit a review.
-                </p>
-              )}
-            </details>
+              </details>
+            ) : (
+              <div className="feedback-auth-prompt">
+                <div>
+                  <span>VERIFIED BUYERS ONLY</span>
+                  <p>
+                    Sign in with the account used for your delivered purchase.
+                    Reviews are published after moderation.
+                  </p>
+                </div>
+                <Link className="button outline" to="/account">
+                  Sign in to review <ArrowRight size={14} />
+                </Link>
+              </div>
+            )}
           </div>
           <div>
             <h3>Product questions</h3>
@@ -1729,11 +1739,13 @@ function ProductFeedback({ product }) {
                 </article>
               ))
             ) : (
-              <p className="feedback-empty">No answered questions yet.</p>
+              <p className="feedback-empty">
+                No answered questions yet. Approved answers will appear here.
+              </p>
             )}
-            <details className="feedback-form">
-              <summary>Ask about this piece</summary>
-              {token ? (
+            {token ? (
+              <details className="feedback-form">
+                <summary>Ask about this piece</summary>
                 <form onSubmit={submitQuestion}>
                   <label>
                     Your question
@@ -1762,13 +1774,21 @@ function ProductFeedback({ product }) {
                     </p>
                   )}
                 </form>
-              ) : (
-                <p>
-                  <Link to="/account">Sign in</Link> to ask a question. Answers
-                  are reviewed before they appear.
-                </p>
-              )}
-            </details>
+              </details>
+            ) : (
+              <div className="feedback-auth-prompt">
+                <div>
+                  <span>HAVE A QUESTION?</span>
+                  <p>
+                    Sign in to ask about fit, fabric, care or garment details.
+                    Answers are reviewed before publication.
+                  </p>
+                </div>
+                <Link className="button outline" to="/account">
+                  Sign in to ask <ArrowRight size={14} />
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}
