@@ -34,6 +34,8 @@ import {
   Package,
   LogOut,
   ChevronRight,
+  Sparkles,
+  MessageCircle,
 } from "lucide-react";
 const API = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
 const C = createContext(null);
@@ -586,19 +588,24 @@ function Header() {
           aria-label="Main navigation"
         >
           <Link to="/" onClick={() => setMenu(false)}>
-            Home
+            <House className="nav-link-icon" size={17} />
+            <span>Home</span>
           </Link>
           <Link to="/products" onClick={() => setMenu(false)}>
-            Shop
+            <Store className="nav-link-icon" size={17} />
+            <span>Shop</span>
           </Link>
           <Link to="/products" onClick={() => setMenu(false)}>
-            Collections
+            <Sparkles className="nav-link-icon" size={17} />
+            <span>Collections</span>
           </Link>
           <Link to="/about" onClick={() => setMenu(false)}>
-            About
+            <UserRound className="nav-link-icon" size={17} />
+            <span>About</span>
           </Link>
           <Link to="/contact" onClick={() => setMenu(false)}>
-            Contact
+            <MessageCircle className="nav-link-icon" size={17} />
+            <span>Contact</span>
           </Link>
         </nav>
         <Link to="/" className="wordmark">
