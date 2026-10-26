@@ -700,15 +700,20 @@ function Home() {
   const { categories } = useStore();
   const reduce = useReducedMotion();
   const categoryCards = categories.length
-    ? categories.slice(0, 6)
-    : [
-        "Western Wear",
-        "Ethnic Wear",
-        "Indo-Western",
-        "Dresses",
-        "Tops",
-        "Co-ord Sets",
-      ].map((name) => ({ name }));
+      ? categories.slice(0, 6)
+      : [
+          "Western Wear",
+          "Ethnic Wear",
+          "Indo-Western",
+          "Dresses",
+          "Tops",
+          "Co-ord Sets",
+        ].map((name) => ({ name })),
+    categoryLoop = Array.from(
+      { length: Math.max(1, Math.ceil(8 / categoryCards.length)) },
+      (_, loop) => categoryCards.map((c, index) => ({ c, loop, index })),
+    ).flat(),
+    marqueeDuration = Math.max(36, categoryLoop.length * 4.5);
   return (
     <main id="top">
       <motion.section
@@ -781,30 +786,37 @@ function Home() {
           role="region"
           aria-label="Browse categories"
         >
-          <div className="circle-category-track">
-            {[false, true].map((duplicate) => (
+          <div
+            className="circle-category-track"
+            style={{ "--category-marquee-duration": `${marqueeDuration}s` }}
+          >
+            {[false, true].map((copy) => (
               <div
                 className="circle-category-group"
-                aria-hidden={duplicate || undefined}
-                key={duplicate ? "duplicate-categories" : "categories"}
+                aria-hidden={copy || undefined}
+                key={copy ? "duplicate-categories" : "categories"}
               >
-                {categoryCards.map((c, i) => (
-                  <Link
-                    key={`${duplicate ? "copy-" : ""}${c._id || c.name}`}
-                    tabIndex={duplicate ? -1 : undefined}
-                    className="circle-category"
-                    to={`/products?category=${encodeURIComponent(c.name)}`}
-                  >
-                    <span>
-                      <img
-                        src={c.image?.url || localCategoryImage(c.name)}
-                        alt=""
-                        loading="lazy"
-                      />
-                    </span>
-                    <b>{c.name}</b>
-                  </Link>
-                ))}
+                {categoryLoop.map(({ c, loop, index }) => {
+                  const decorative = copy || loop > 0;
+                  return (
+                    <Link
+                      key={`${copy ? "copy-" : ""}${loop}-${index}-${c._id || c.name}`}
+                      aria-hidden={decorative || undefined}
+                      tabIndex={decorative ? -1 : undefined}
+                      className="circle-category"
+                      to={`/products?category=${encodeURIComponent(c.name)}`}
+                    >
+                      <span>
+                        <img
+                          src={c.image?.url || localCategoryImage(c.name)}
+                          alt=""
+                          loading="lazy"
+                        />
+                      </span>
+                      <b>{c.name}</b>
+                    </Link>
+                  );
+                })}
               </div>
             ))}
           </div>

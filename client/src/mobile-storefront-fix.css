@@ -53,7 +53,7 @@
     object-position: 55% center;
   }
 
-  /* A swipeable row is more legible and controllable than a moving, clipped marquee. */
+  /* The loop contains enough repeated cards to cover the viewport, so it never exposes a blank gap. */
   .circle-categories {
     padding: 46px 0 50px;
   }
@@ -64,34 +64,27 @@
   .circle-category-row {
     width: 100%;
     margin-top: 25px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 3px 7% 13px;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
-  }
-  .circle-category-row::-webkit-scrollbar {
-    display: none;
+    overflow: hidden;
+    padding: 3px 0 13px;
   }
   .circle-category-track {
-    width: auto;
-    animation: none;
-    transform: none;
+    width: max-content;
+    animation: category-marquee var(--category-marquee-duration, 42s) linear
+      infinite;
+    transform: translateX(0);
+    will-change: transform;
   }
   .circle-category-group {
     gap: 14px;
-    padding: 0;
+    padding-right: 14px;
   }
   .circle-category-group[aria-hidden="true"] {
-    display: none;
+    display: flex;
   }
   .circle-category {
     flex-basis: 91px;
     gap: 10px;
     font-size: 10px;
-    scroll-snap-align: start;
   }
   .circle-category > span {
     width: 82px;
