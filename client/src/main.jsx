@@ -5,6 +5,7 @@ import App from "./App.jsx";
 import "./style.css";
 import "./customer-dark-theme.css";
 import "./mobile-storefront-fix.css";
+import "./compact-landscape-nav-fix.css";
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>

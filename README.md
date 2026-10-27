@@ -112,3 +112,5 @@ DEMO_CATALOG_CONFIRM=seed-vimuhet-demo node scripts/seed-demo-catalog.js
 Remove demo catalog data later
 cd /d/vimuhet/vimuhet_1.2/server
 DEMO_CATALOG_CONFIRM=remove-vimuhet-demo node scripts/remove-demo-catalog.js
+
+app password: lkaeraudzcousfgc

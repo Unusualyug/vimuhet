@@ -1,0 +1,109 @@
+/* Compact landscape navigation: 601–700px-wide phones cannot safely fit the desktop link, search, account and bag clusters. */
+@media (min-width: 601px) and (max-width: 700px) {
+  .nav {
+    height: 62px;
+    display: flex;
+    padding-inline: 4%;
+  }
+  .nav .mobile {
+    display: inline-flex;
+  }
+  .nav .wordmark {
+    font-size: 22px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .nav .links {
+    display: none;
+    position: absolute;
+    top: 62px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding: 10px 6% 14px;
+    background: #100d18fa;
+    border-bottom: 1px solid var(--customer-border);
+    box-shadow: 0 18px 34px #07040bb8;
+    z-index: 20;
+  }
+  .nav .links.open {
+    display: flex;
+  }
+  .nav .links a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 11px 1px;
+    border-bottom: 1px solid #44334f;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .nav .links a:last-child {
+    border-bottom: 0;
+  }
+  .nav .links .nav-link-icon {
+    display: block;
+    flex: none;
+    color: #f59bc8;
+    stroke-width: 1.75;
+  }
+  .nav .links a span {
+    line-height: 1.2;
+  }
+  .nav-actions {
+    margin-left: auto;
+  }
+  .nav-actions .desktop {
+    display: none;
+  }
+  .nav-actions .search {
+    width: 30px;
+    border: 0;
+  }
+  .nav-actions .search input {
+    display: none;
+  }
+  .nav.search-active > .mobile,
+  .nav.search-active > .wordmark,
+  .nav.search-active .nav-actions > .bag {
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .nav.search-active .nav-actions {
+    position: static;
+  }
+  .nav.search-active .nav-actions .search.search-open {
+    position: absolute;
+    z-index: 30;
+    top: 50%;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    min-height: 45px;
+    margin: 0;
+    padding: 8px 10px;
+    transform: translateY(-50%);
+    background: #17121f;
+    border: 1px solid #765286;
+    box-shadow: 0 12px 28px #08050d99;
+  }
+  .nav.search-active .nav-actions .search.search-open input {
+    display: block;
+    min-width: 0;
+    font-size: 12px;
+    color: #f8eff8;
+  }
+  .nav.search-active .nav-actions .search.search-open .search-trigger {
+    flex: none;
+    color: #f59bc8;
+  }
+  .nav.search-active .search-suggestions {
+    right: 0;
+    left: 0;
+    width: auto;
+  }
+}
