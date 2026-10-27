@@ -38,6 +38,7 @@ import {
 } from "./services/paymentSecurity.js";
 import { effectivePrice, publicProduct } from "./services/pricing.js";
 const app = express();
+app.set("trust proxy", 1);
 app.use(helmet());
 app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173" }));
 app.use("/api/auth", rateLimit({ windowMs: 15 * 60e3, max: 30 }));
@@ -513,11 +514,9 @@ api.post("/contact", async (req, res) => {
     message.trim().length < 10 ||
     message.length > 4000
   )
-    return res
-      .status(400)
-      .json({
-        error: "Enter a valid name, email and message (10–4,000 characters)",
-      });
+    return res.status(400).json({
+      error: "Enter a valid name, email and message (10–4,000 characters)",
+    });
   try {
     await sendContactMessage({
       name: name.trim(),
@@ -528,12 +527,10 @@ api.post("/contact", async (req, res) => {
       .status(202)
       .json({ message: "Your message was sent to the VIMUHET team." });
   } catch {
-    return res
-      .status(503)
-      .json({
-        error:
-          "Contact email is temporarily unavailable. Please try again later.",
-      });
+    return res.status(503).json({
+      error:
+        "Contact email is temporarily unavailable. Please try again later.",
+    });
   }
 });
 api.use((req, res, next) =>
@@ -611,12 +608,10 @@ api.post("/newsletter", async (req, res) => {
       { upsert: true, new: true, runValidators: true },
     );
     sendNewsletterWelcome(email, raw).catch(console.error);
-    return res
-      .status(202)
-      .json({
-        message:
-          "Thanks for subscribing. You can unsubscribe using the link in your email.",
-      });
+    return res.status(202).json({
+      message:
+        "Thanks for subscribing. You can unsubscribe using the link in your email.",
+    });
   } catch {
     return res.status(500).json({ error: "Unable to save subscription" });
   }
@@ -633,11 +628,9 @@ api.post("/newsletter/unsubscribe", async (req, res) => {
   );
   return subscriber
     ? res.json({ message: "You have been unsubscribed." })
-    : res
-        .status(404)
-        .json({
-          error: "This unsubscribe link is invalid or has already been used.",
-        });
+    : res.status(404).json({
+        error: "This unsubscribe link is invalid or has already been used.",
+      });
 });
 api.get("/products", async (req, res, next) => {
   try {
@@ -674,11 +667,9 @@ api.post("/products/:slug/stock-alerts", async (req, res) => {
     size = String(req.body.size || "").trim(),
     color = String(req.body.color || "").trim();
   if (req.body.consent !== true || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-    return res
-      .status(400)
-      .json({
-        error: "A valid email and explicit stock-alert consent are required",
-      });
+    return res.status(400).json({
+      error: "A valid email and explicit stock-alert consent are required",
+    });
   try {
     const product = await Product.findOne({
       slug: req.params.slug,
@@ -713,22 +704,18 @@ api.post("/products/:slug/stock-alerts", async (req, res) => {
       status: "active",
       consentedAt: new Date(),
     });
-    res
-      .status(201)
-      .json({
-        message:
-          "You are subscribed. We will send one email if this selection returns to stock.",
-      });
+    res.status(201).json({
+      message:
+        "You are subscribed. We will send one email if this selection returns to stock.",
+    });
   } catch (e) {
-    res
-      .status(e.code === 11000 ? 200 : 400)
-      .json({
-        message:
-          e.code === 11000
-            ? "You are already subscribed for this selection."
-            : undefined,
-        error: e.code === 11000 ? undefined : "Unable to save stock alert",
-      });
+    res.status(e.code === 11000 ? 200 : 400).json({
+      message:
+        e.code === 11000
+          ? "You are already subscribed for this selection."
+          : undefined,
+      error: e.code === 11000 ? undefined : "Unable to save stock alert",
+    });
   }
 });
 api.post("/stock-alerts/unsubscribe", async (req, res) => {
@@ -746,11 +733,9 @@ api.post("/stock-alerts/unsubscribe", async (req, res) => {
         message:
           "You will not receive any further emails for this stock alert.",
       })
-    : res
-        .status(404)
-        .json({
-          error: "This stock-alert link is invalid or has already been used",
-        });
+    : res.status(404).json({
+        error: "This stock-alert link is invalid or has already been used",
+      });
 });
 function feedbackPage(query = {}) {
   const page = Math.max(1, parseInt(query.page || "1", 10) || 1),
@@ -828,12 +813,10 @@ api.post(
       body.length < 10 ||
       body.length > 2000
     )
-      return res
-        .status(400)
-        .json({
-          error:
-            "Use a 1–5 rating, title of 3–120 characters and review of 10–2,000 characters",
-        });
+      return res.status(400).json({
+        error:
+          "Use a 1–5 rating, title of 3–120 characters and review of 10–2,000 characters",
+      });
     try {
       const product = await Product.findOne({
         slug: req.params.slug,
@@ -847,18 +830,14 @@ api.post(
         "items.product": product._id,
       }).select("_id");
       if (!purchase)
-        return res
-          .status(403)
-          .json({
-            error:
-              "Only a delivered, paid purchase from this account can be reviewed",
-          });
+        return res.status(403).json({
+          error:
+            "Only a delivered, paid purchase from this account can be reviewed",
+        });
       if (await Review.exists({ product: product._id, user: req.user.id }))
-        return res
-          .status(409)
-          .json({
-            error: "You have already submitted a review for this product",
-          });
+        return res.status(409).json({
+          error: "You have already submitted a review for this product",
+        });
       const user = await User.findById(req.user.id).select("name");
       if (!user) return res.sendStatus(401);
       await Review.create({
@@ -872,21 +851,17 @@ api.post(
         verifiedPurchase: true,
         status: "pending",
       });
-      res
-        .status(201)
-        .json({
-          message:
-            "Thanks — your verified-purchase review is awaiting moderation.",
-        });
+      res.status(201).json({
+        message:
+          "Thanks — your verified-purchase review is awaiting moderation.",
+      });
     } catch (e) {
-      res
-        .status(e?.code === 11000 ? 409 : 400)
-        .json({
-          error:
-            e?.code === 11000
-              ? "You have already submitted a review for this product"
-              : "Unable to submit review",
-        });
+      res.status(e?.code === 11000 ? 409 : 400).json({
+        error:
+          e?.code === 11000
+            ? "You have already submitted a review for this product"
+            : "Unable to submit review",
+      });
     }
   },
 );
@@ -958,12 +933,10 @@ api.post("/auth/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
     if (!name || !email || !password || password.length < 10)
-      return res
-        .status(400)
-        .json({
-          error:
-            "Name, email and a password of at least 10 characters are required",
-        });
+      return res.status(400).json({
+        error:
+          "Name, email and a password of at least 10 characters are required",
+      });
     const user = await User.create({
       name,
       email,
@@ -975,19 +948,15 @@ api.post("/auth/register", async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "7d" },
     );
-    res
-      .status(201)
-      .json({
-        token,
-        user: { id: user.id, name: user.name, email: user.email },
-      });
+    res.status(201).json({
+      token,
+      user: { id: user.id, name: user.name, email: user.email },
+    });
   } catch (e) {
-    res
-      .status(e.code === 11000 ? 409 : 400)
-      .json({
-        error:
-          e.code === 11000 ? "Email already registered" : "Registration failed",
-      });
+    res.status(e.code === 11000 ? 409 : 400).json({
+      error:
+        e.code === 11000 ? "Email already registered" : "Registration failed",
+    });
   }
 });
 api.post("/auth/login", async (req, res) => {
@@ -1072,12 +1041,10 @@ api.get("/auth/me", auth, async (req, res) => {
 api.post("/auth/me/addresses", auth, async (req, res) => {
   const address = normalizeAddress(req.body || {});
   if (!address)
-    return res
-      .status(400)
-      .json({
-        error:
-          "Enter a valid name, phone, street address, city, state and postal code",
-      });
+    return res.status(400).json({
+      error:
+        "Enter a valid name, phone, street address, city, state and postal code",
+    });
   try {
     const u = await User.findById(req.user.id);
     if (!u) return res.sendStatus(404);
@@ -1093,12 +1060,10 @@ api.post("/auth/me/addresses", auth, async (req, res) => {
 api.patch("/auth/me/addresses/:addressId", auth, async (req, res) => {
   const address = normalizeAddress(req.body || {});
   if (!address)
-    return res
-      .status(400)
-      .json({
-        error:
-          "Enter a valid name, phone, street address, city, state and postal code",
-      });
+    return res.status(400).json({
+      error:
+        "Enter a valid name, phone, street address, city, state and postal code",
+    });
   try {
     const set = Object.fromEntries(
       Object.entries(address).map(([key, value]) => [
@@ -1287,11 +1252,9 @@ api.post("/cart-reminders/unsubscribe", async (req, res) => {
     );
   user
     ? res.json({ message: "Cart reminders are off." })
-    : res
-        .status(404)
-        .json({
-          error: "This cart-reminder link is invalid or has already been used",
-        });
+    : res.status(404).json({
+        error: "This cart-reminder link is invalid or has already been used",
+      });
 });
 api.post("/setup/bootstrap-admin", async (req, res) => {
   if (
@@ -1304,11 +1267,9 @@ api.post("/setup/bootstrap-admin", async (req, res) => {
       return res.status(409).json({ error: "An administrator already exists" });
     const { email, password, name } = req.body;
     if (!email || !password || password.length < 14)
-      return res
-        .status(400)
-        .json({
-          error: "Email and a password of at least 14 characters are required",
-        });
+      return res.status(400).json({
+        error: "Email and a password of at least 14 characters are required",
+      });
     const user = await User.create({
       name: name || "VIMUHET Admin",
       email,
@@ -1354,11 +1315,9 @@ api.post("/orders", async (req, res) => {
       !shipping?.name ||
       !shipping?.line1
     )
-      return res
-        .status(400)
-        .json({
-          error: "Valid items, email and delivery details are required",
-        });
+      return res.status(400).json({
+        error: "Valid items, email and delivery details are required",
+      });
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET)
       return res
         .status(503)
@@ -1372,22 +1331,18 @@ api.post("/orders", async (req, res) => {
         prior.email !== String(email).trim().toLowerCase() ||
         String(prior.user || "") !== String(customerId || "")
       )
-        return res
-          .status(409)
-          .json({
-            error:
-              "This checkout key is already associated with a different order identity",
-          });
+        return res.status(409).json({
+          error:
+            "This checkout key is already associated with a different order identity",
+        });
       if (
         prior.status !== "pending_payment" ||
         prior.paymentStatus !== "pending"
       )
-        return res
-          .status(409)
-          .json({
-            error:
-              "This payment attempt is no longer active. Try checkout again.",
-          });
+        return res.status(409).json({
+          error:
+            "This payment attempt is no longer active. Try checkout again.",
+        });
       const guestCode = crypto
         .createHmac("sha256", process.env.JWT_SECRET)
         .update(`guest:${idem}`)
@@ -1446,17 +1401,13 @@ api.post("/orders", async (req, res) => {
         ? p.variants.find((v) => v.size === size && v.color === color)
         : null;
       if (p.variants?.length && !variant)
-        return res
-          .status(400)
-          .json({
-            error: `Choose a valid size and color combination for ${p.name}`,
-          });
+        return res.status(400).json({
+          error: `Choose a valid size and color combination for ${p.name}`,
+        });
       if (variant && variant.stock < quantity)
-        return res
-          .status(409)
-          .json({
-            error: `That size and color of ${p.name} is no longer available`,
-          });
+        return res.status(409).json({
+          error: `That size and color of ${p.name} is no longer available`,
+        });
       orderItems.push({
         product: p._id,
         variantId: variant?._id,
@@ -1509,12 +1460,10 @@ api.post("/orders", async (req, res) => {
           );
       if (result.modifiedCount !== 1) {
         await restoreReserved(reserved);
-        return res
-          .status(409)
-          .json({
-            error:
-              "Stock changed while you were checking out. Please refresh your bag.",
-          });
+        return res.status(409).json({
+          error:
+            "Stock changed while you were checking out. Please refresh your bag.",
+        });
       }
       reserved.push({ id: productId, quantity, variantId });
     }
@@ -1739,11 +1688,9 @@ api.post("/orders/lookup", async (req, res) => {
       .toUpperCase(),
     code = String(req.body.accessCode || "").trim();
   if (!/^VM[A-Z0-9-]{5,32}$/.test(number) || !/^[a-f0-9]{64}$/i.test(code))
-    return res
-      .status(400)
-      .json({
-        error: "Enter the order number and 64-character guest access code",
-      });
+    return res.status(400).json({
+      error: "Enter the order number and 64-character guest access code",
+    });
   try {
     const hash = crypto.createHash("sha256").update(code).digest("hex"),
       order = await Order.findOne({ number, guestCodeHash: hash }).select(
@@ -1801,12 +1748,9 @@ api.post("/orders/:id/requests", async (req, res) => {
     reason.length < 10 ||
     reason.length > 1000
   )
-    return res
-      .status(400)
-      .json({
-        error:
-          "Choose a request type and provide a reason (10–1,000 characters)",
-      });
+    return res.status(400).json({
+      error: "Choose a request type and provide a reason (10–1,000 characters)",
+    });
   try {
     const order = await Order.findById(req.params.id);
     if (!order) return res.sendStatus(404);
@@ -1835,14 +1779,12 @@ api.post("/orders/:id/requests", async (req, res) => {
           ["confirmed", "processing"].includes(order.status)
         : order.paymentStatus === "paid" && order.status === "delivered";
     if (!eligible)
-      return res
-        .status(409)
-        .json({
-          error:
-            type === "cancellation"
-              ? "Only confirmed or processing paid orders can request cancellation review."
-              : "Return review can only be requested for a delivered paid order.",
-        });
+      return res.status(409).json({
+        error:
+          type === "cancellation"
+            ? "Only confirmed or processing paid orders can request cancellation review."
+            : "Return review can only be requested for a delivered paid order.",
+      });
     const updated = await Order.findOneAndUpdate(
       {
         _id: order._id,
@@ -1863,11 +1805,9 @@ api.post("/orders/:id/requests", async (req, res) => {
       { new: true },
     );
     if (!updated)
-      return res
-        .status(409)
-        .json({
-          error: "A pending request already exists or the order changed.",
-        });
+      return res.status(409).json({
+        error: "A pending request already exists or the order changed.",
+      });
     res.status(201).json(updated);
   } catch {
     return res.status(400).json({ error: "Unable to submit order request" });
@@ -1885,12 +1825,10 @@ api.patch(
       reviewNote.length < 3 ||
       reviewNote.length > 1000
     )
-      return res
-        .status(400)
-        .json({
-          error:
-            "Choose approved or rejected and provide a review note (3–1,000 characters)",
-        });
+      return res.status(400).json({
+        error:
+          "Choose approved or rejected and provide a review note (3–1,000 characters)",
+      });
     try {
       const order = await Order.findOneAndUpdate(
         {
@@ -1965,12 +1903,10 @@ api.patch("/admin/reviews/:id", auth, admin, async (req, res) => {
     !["published", "rejected"].includes(status) ||
     moderationNote.length > 1000
   )
-    return res
-      .status(400)
-      .json({
-        error:
-          "Choose published or rejected and keep the moderation note under 1,000 characters",
-      });
+    return res.status(400).json({
+      error:
+        "Choose published or rejected and keep the moderation note under 1,000 characters",
+    });
   try {
     const review = await Review.findByIdAndUpdate(
       req.params.id,
@@ -2030,14 +1966,12 @@ api.patch("/admin/questions/:id", auth, admin, async (req, res) => {
     moderationNote.length > 1000 ||
     (status === "published" && (answer.length < 3 || answer.length > 2000))
   )
-    return res
-      .status(400)
-      .json({
-        error:
-          status === "published"
-            ? "Published answers must be 3–2,000 characters"
-            : "Choose published or rejected and keep the moderation note under 1,000 characters",
-      });
+    return res.status(400).json({
+      error:
+        status === "published"
+          ? "Published answers must be 3–2,000 characters"
+          : "Choose published or rejected and keep the moderation note under 1,000 characters",
+    });
   try {
     const updates = {
       status,
@@ -2169,14 +2103,12 @@ api.post("/admin/coupons", auth, admin, async (req, res) => {
     );
     res.status(201).json(coupon);
   } catch (e) {
-    res
-      .status(e.code === 11000 ? 409 : 400)
-      .json({
-        error:
-          e.code === 11000
-            ? "Coupon code already exists"
-            : e.message || "Invalid coupon",
-      });
+    res.status(e.code === 11000 ? 409 : 400).json({
+      error:
+        e.code === 11000
+          ? "Coupon code already exists"
+          : e.message || "Invalid coupon",
+    });
   }
 });
 api.patch("/admin/coupons/:id", auth, admin, async (req, res) => {
@@ -2197,14 +2129,12 @@ api.patch("/admin/coupons/:id", auth, admin, async (req, res) => {
     );
     res.json(coupon);
   } catch (e) {
-    res
-      .status(e.code === 11000 ? 409 : 400)
-      .json({
-        error:
-          e.code === 11000
-            ? "Coupon code already exists"
-            : e.message || "Invalid coupon",
-      });
+    res.status(e.code === 11000 ? 409 : 400).json({
+      error:
+        e.code === 11000
+          ? "Coupon code already exists"
+          : e.message || "Invalid coupon",
+    });
   }
 });
 function dashboardRange(query = {}) {
@@ -2775,12 +2705,10 @@ api.post("/admin/inventory/:id/adjust", auth, admin, async (req, res) => {
     reason.length < 3 ||
     reason.length > 300
   )
-    return res
-      .status(400)
-      .json({
-        error:
-          "Enter a non-zero whole-number adjustment and a reason (3–300 characters)",
-      });
+    return res.status(400).json({
+      error:
+        "Enter a non-zero whole-number adjustment and a reason (3–300 characters)",
+    });
   try {
     if (
       await Product.exists({
@@ -2788,23 +2716,19 @@ api.post("/admin/inventory/:id/adjust", auth, admin, async (req, res) => {
         "variants.0": { $exists: true },
       })
     )
-      return res
-        .status(409)
-        .json({
-          error:
-            "This product is tracked by variant. Adjust its individual size/color variant instead.",
-        });
+      return res.status(409).json({
+        error:
+          "This product is tracked by variant. Adjust its individual size/color variant instead.",
+      });
     const product = await Product.findOneAndUpdate(
       { _id: req.params.id, stock: { $gte: Math.max(0, -delta) } },
       { $inc: { stock: delta } },
       { new: true, runValidators: true },
     );
     if (!product)
-      return res
-        .status(409)
-        .json({
-          error: "Product not found or adjustment would make stock negative",
-        });
+      return res.status(409).json({
+        error: "Product not found or adjustment would make stock negative",
+      });
     const movement = await InventoryMovement.create({
       product: product._id,
       actor: req.user.id,
@@ -2841,12 +2765,10 @@ api.post(
       reason.length < 3 ||
       reason.length > 300
     )
-      return res
-        .status(400)
-        .json({
-          error:
-            "Enter a non-zero whole-number adjustment and a reason (3–300 characters)",
-        });
+      return res.status(400).json({
+        error:
+          "Enter a non-zero whole-number adjustment and a reason (3–300 characters)",
+      });
     try {
       const product = await Product.findOneAndUpdate(
         {
@@ -2872,11 +2794,9 @@ api.post(
         },
       );
       if (!product)
-        return res
-          .status(409)
-          .json({
-            error: "Variant not found or adjustment would make stock negative",
-          });
+        return res.status(409).json({
+          error: "Variant not found or adjustment would make stock negative",
+        });
       const variant = product.variants.id(req.params.variantId);
       const movement = await InventoryMovement.create({
         product: product._id,
@@ -3116,12 +3036,10 @@ api.post("/admin/products", auth, admin, async (req, res) => {
           stock < 0 ||
           seen.has(key)
         )
-          return res
-            .status(400)
-            .json({
-              error:
-                "Each variant needs a unique size/color pair and non-negative whole-number stock",
-            });
+          return res.status(400).json({
+            error:
+              "Each variant needs a unique size/color pair and non-negative whole-number stock",
+          });
         seen.add(key);
         v.size = size;
         v.color = color;
@@ -3147,21 +3065,17 @@ api.post("/admin/products", auth, admin, async (req, res) => {
       !Number.isInteger(Number(d.stock)) ||
       Number(d.stock) < 0
     )
-      return res
-        .status(400)
-        .json({
-          error:
-            "Name, category, non-negative price and whole-number stock are required",
-        });
+      return res.status(400).json({
+        error:
+          "Name, category, non-negative price and whole-number stock are required",
+      });
     if (
       d.salePrice != null &&
       (Number(d.salePrice) < 0 || Number(d.salePrice) > Number(d.price))
     )
-      return res
-        .status(400)
-        .json({
-          error: "Sale price must be between zero and the regular price",
-        });
+      return res.status(400).json({
+        error: "Sale price must be between zero and the regular price",
+      });
     const saleStart = d.saleStartsAt ? new Date(d.saleStartsAt) : null,
       saleEnd = d.saleEndsAt ? new Date(d.saleEndsAt) : null;
     if (
@@ -3169,11 +3083,9 @@ api.post("/admin/products", auth, admin, async (req, res) => {
       (saleEnd && Number.isNaN(saleEnd.getTime())) ||
       (saleStart && saleEnd && saleEnd <= saleStart)
     )
-      return res
-        .status(400)
-        .json({
-          error: "Sale dates must be valid and the end must follow the start",
-        });
+      return res.status(400).json({
+        error: "Sale dates must be valid and the end must follow the start",
+      });
     const data = {
       ...d,
       name: d.name.trim(),
@@ -3196,14 +3108,12 @@ api.post("/admin/products", auth, admin, async (req, res) => {
     );
     res.status(201).json(product);
   } catch (e) {
-    res
-      .status(400)
-      .json({
-        error:
-          e.code === 11000
-            ? "Product slug or SKU already exists"
-            : "Invalid product",
-      });
+    res.status(400).json({
+      error:
+        e.code === 11000
+          ? "Product slug or SKU already exists"
+          : "Invalid product",
+    });
   }
 });
 api.patch("/admin/products/:id", auth, admin, async (req, res) => {
@@ -3274,11 +3184,9 @@ api.patch("/admin/products/:id", auth, admin, async (req, res) => {
             ? existing.salePrice
             : Number(data.salePrice);
     if (finalSale != null && (finalSale < 0 || finalSale > finalPrice))
-      return res
-        .status(400)
-        .json({
-          error: "Sale price must be between zero and the regular price",
-        });
+      return res.status(400).json({
+        error: "Sale price must be between zero and the regular price",
+      });
     const startValue =
         data.saleStartsAt === null
           ? null
@@ -3298,11 +3206,9 @@ api.patch("/admin/products/:id", auth, admin, async (req, res) => {
       (saleEnd && Number.isNaN(saleEnd.getTime())) ||
       (saleStart && saleEnd && saleEnd <= saleStart)
     )
-      return res
-        .status(400)
-        .json({
-          error: "Sale dates must be valid and the end must follow the start",
-        });
+      return res.status(400).json({
+        error: "Sale dates must be valid and the end must follow the start",
+      });
     if (
       data.stock != null &&
       (!Number.isInteger(Number(data.stock)) || Number(data.stock) < 0)
@@ -3332,14 +3238,12 @@ api.patch("/admin/products/:id", auth, admin, async (req, res) => {
     );
     res.json(p);
   } catch (e) {
-    res
-      .status(e.code === 11000 ? 409 : 400)
-      .json({
-        error:
-          e.code === 11000
-            ? "Product SKU or slug already exists"
-            : "Invalid product",
-      });
+    res.status(e.code === 11000 ? 409 : 400).json({
+      error:
+        e.code === 11000
+          ? "Product SKU or slug already exists"
+          : "Invalid product",
+    });
   }
 });
 api.delete("/admin/products/:id", auth, admin, async (req, res) => {
@@ -3347,12 +3251,10 @@ api.delete("/admin/products/:id", auth, admin, async (req, res) => {
     const p = await Product.findById(req.params.id);
     if (!p) return res.sendStatus(404);
     if (await Order.exists({ "items.product": p._id }))
-      return res
-        .status(409)
-        .json({
-          error:
-            "Product is referenced by order history. Archive it instead of deleting.",
-        });
+      return res.status(409).json({
+        error:
+          "Product is referenced by order history. Archive it instead of deleting.",
+      });
     await Product.deleteOne({ _id: p._id });
     if (process.env.CLOUDINARY_CLOUD_NAME) {
       const { v2: c } = await import("cloudinary");
@@ -3408,12 +3310,10 @@ api.post("/admin/orders/:id/refund", auth, admin, async (req, res) => {
       { new: true },
     );
     if (!claimed)
-      return res
-        .status(409)
-        .json({
-          error:
-            "A refund request is already in progress or the order changed; reconcile before retrying",
-        });
+      return res.status(409).json({
+        error:
+          "A refund request is already in progress or the order changed; reconcile before retrying",
+      });
     const rz = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID,
       key_secret: process.env.RAZORPAY_KEY_SECRET,
@@ -3439,12 +3339,10 @@ api.post("/admin/orders/:id/refund", auth, admin, async (req, res) => {
     );
     return res.json(order);
   } catch (e) {
-    return res
-      .status(502)
-      .json({
-        error:
-          "Refund request could not be confirmed; reconcile with Razorpay before retrying",
-      });
+    return res.status(502).json({
+      error:
+        "Refund request could not be confirmed; reconcile with Razorpay before retrying",
+    });
   }
 });
 api.get("/admin/orders", auth, admin, async (req, res) => {
